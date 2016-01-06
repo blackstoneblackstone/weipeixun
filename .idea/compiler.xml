@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <resourceExtensions />
+    <wildcardResourcePatterns>
+      <entry name="!?*.java" />
+      <entry name="!?*.form" />
+      <entry name="!?*.class" />
+      <entry name="!?*.groovy" />
+      <entry name="!?*.scala" />
+      <entry name="!?*.flex" />
+      <entry name="!?*.kt" />
+      <entry name="!?*.clj" />
+      <entry name="!?*.aj" />
+    </wildcardResourcePatterns>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="weixin4j-base" />
+        <module name="weixin4j-cms" />
+        <module name="weixin4j-mp" />
+        <module name="weixin4j-qy" />
+        <module name="weixin4j-server" />
+        <module name="WPX-base" />
+        <module name="WPX-cms" />
+        <module name="WPX-web" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="1.6">
+      <module name="cms" target="1.7" />
+      <module name="weixin4j" target="1.7" />
+      <module name="weixin4j-base" target="1.7" />
+      <module name="weixin4j-cms" target="1.7" />
+      <module name="weixin4j-mp" target="1.7" />
+      <module name="weixin4j-qy" target="1.7" />
+      <module name="weixin4j-server" target="1.7" />
+      <module name="WPX" target="1.7" />
+      <module name="WPX-base" target="1.7" />
+      <module name="WPX-cms" target="1.7" />
+      <module name="WPX-web" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

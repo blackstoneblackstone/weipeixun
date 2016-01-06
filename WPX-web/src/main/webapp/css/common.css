@@ -1,0 +1,55 @@
+/*公共css*/
+body {
+    font-size: 14px;
+    font-family: Arial, "Microsoft YaHei", "Helvetica Neue", Helvetica, "Hiragino Sans GB", sans-serif;
+    line-height: 1.5;
+    color: #666666;
+    word-break: normal;
+    word-wrap: break-word;
+    background-color: #FBF9FE;
+}
+
+.page {
+    background-color: #FBF9FE;
+}
+
+.header-img {
+    height: 150px;
+    background-image: url("http://www.wexue.top:20000/images/sky-1.jpg!1200!150");
+    background-size: 100%;
+    background-color: #cccccc;
+}
+
+.portrait {
+    height: 80px;
+    width: 80px;
+    background-color: #cccccc;
+    border-radius: 40px;
+    border: solid #ffffff 2px;
+    margin-top: 20px;
+
+}
+
+.ui-icon-loading {
+    background: url(/image/wx/ajax-loader.gif);
+}
+
+.bxk-list > li  img {
+    width: 80%;
+    height: 80%;
+    border: solid #C8C8CD 2px;
+    margin-top: 10px;
+}
+.bxk-list > li  h2 {
+   color:#04BE02;
+}
+.bxk-list > li  .date {
+    color: #5a64be;
+}
+.ui-listview>li p {
+    margin: 0;
+}
+img{
+    background-color: #DFDFDF;
+}
+

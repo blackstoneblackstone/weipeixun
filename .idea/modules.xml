@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/WPX-base/WPX-base.iml" filepath="$PROJECT_DIR$/WPX-base/WPX-base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WPX-cms/WPX-cms.iml" filepath="$PROJECT_DIR$/WPX-cms/WPX-cms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WPX-web/WPX-web.iml" filepath="$PROJECT_DIR$/WPX-web/WPX-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/weixin4j.iml" filepath="$PROJECT_DIR$/weixin4j.iml" />
+      <module fileurl="file://$PROJECT_DIR$/weixin4j-base/weixin4j-base.iml" filepath="$PROJECT_DIR$/weixin4j-base/weixin4j-base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/weixin4j-mp/weixin4j-mp.iml" filepath="$PROJECT_DIR$/weixin4j-mp/weixin4j-mp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/weixin4j-qy/weixin4j-qy.iml" filepath="$PROJECT_DIR$/weixin4j-qy/weixin4j-qy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/weixin4j-server/weixin4j-server.iml" filepath="$PROJECT_DIR$/weixin4j-server/weixin4j-server.iml" />
+    </modules>
+  </component>
+</project>

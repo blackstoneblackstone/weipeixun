@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="WPX-web:war">
+    <output-path>$PROJECT_DIR$/WPX-web/target</output-path>
+    <root id="archive" name="WPX-web.war">
+      <element id="artifact" artifact-name="WPX-web:war exploded" />
+    </root>
+  </artifact>
+</component>

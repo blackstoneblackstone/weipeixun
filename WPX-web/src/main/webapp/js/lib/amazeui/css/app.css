@@ -1,0 +1,229 @@
+/* Write your styles */
+body {
+    font-size:14px;
+    font-family: Arial, "Microsoft YaHei", "Helvetica Neue", Helvetica, "Hiragino Sans GB", sans-serif;
+    line-height: 1.5;
+    color: #666666;
+    word-break: normal;
+    word-wrap: break-word;
+}
+
+.package_list {
+    width: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
+    margin: auto;
+    margin-top: 15px;
+}
+
+.package_item {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    background: #fff;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 3px #ccc;
+}
+
+.package_cover {
+    position: relative;
+}
+
+.package_need_pay {
+    position: absolute;
+    left: -6px;
+    top: 5px;
+    width: 30px;
+}
+
+.package_param {
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.package_teacher {
+    float: left;
+    overflow: hidden;
+    border: 1px solid #0e90d2;
+    border-radius: 30px;
+    border-left: none;
+    margin-top: 3px;
+}
+
+.package_teacher_icon {
+    width: 30px;
+    height: 30px;
+    background: #0e90d2;
+    border-radius: 50%;
+    overflow: hidden;
+    float: left;
+}
+
+.package_teacher_icon img {
+    width: 65%;
+    margin: 5px auto;
+}
+
+.package_teacher_name {
+    padding: 0 10px 0 5px;
+    line-height: 31px;
+    font-size: 0.9em;
+    color: #7C7C7C;
+    max-width: 150px;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    float: left;
+    height: 30px;
+}
+
+.package_num {
+    float: right;
+    margin-right: 5px;
+}
+
+.package_num div {
+    float: left;
+    width: 40px;
+}
+
+.package_num div:last-child {
+}
+
+.package_num div img {
+    width: 20px;
+    margin: auto;
+}
+
+.package_num div span {
+    font-size: 12px;
+    display: block;
+    line-height: 20px;
+    text-align: center;
+}
+
+.package_excellent {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 10px;
+    right: 10px;
+    background: #0e90d2;
+    opacity: 0.7;
+    border-radius: 50%;
+}
+
+.package_excellent_img {
+    width: 20px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.package_title {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    line-height: 25px;
+    text-indent: 6px;
+    font-size: 0.9em;
+    color: #fff;
+    z-index: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /*white-space: nowrap;*/
+}
+
+.package_title_background {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #000;
+    opacity: 0.3;
+    height: 80px;
+    z-index: 1;
+}
+
+.package_title span {
+    background: #FA6334;
+    padding: 1px 7px;
+    font-size: 12px;
+    border-radius: 25px;
+    margin-right: 2px;
+    line-height: 12px;
+    margin-top: 5px;
+    margin-left: 5px;
+    /*float: left;*/
+    text-indent: 0;
+}
+
+.package_button {
+    float: right;
+    margin-top: 5px;
+}
+
+img {
+    display: block;
+    width: 100%;
+}
+
+i {
+    padding-right: 5px;
+}
+
+.header-img {
+    vertical-align: middle;
+}
+
+.header-img img {
+    height: 30px !important;
+    width: auto;
+    border-radius: 50%;
+}
+
+.wx-header {
+    text-align: center;
+    height: 100px;
+}
+
+.wx-header-bg {
+    position: absolute;
+    top: 0px;
+    z-index: -1;
+}
+
+.wx-header-img {
+    z-index: 99;
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    margin: auto;
+    position: relative;
+    margin-top: 20px;
+}
+
+.course-detail {
+    padding: 20px;
+    background-color: RGBa(255, 255, 255, 0.7);
+}
+
+.course-detail p {
+    margin: 0px;
+}
+
+.btn-order {
+    position: fixed;
+    right: 10px;
+    bottom: 150px;
+    z-index: 999;
+}
+
+.btn-order a {
+    background-color: #dd514c;
+    color: white;
+}
+
