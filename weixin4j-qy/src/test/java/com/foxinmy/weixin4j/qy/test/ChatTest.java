@@ -23,15 +23,16 @@ public class ChatTest extends TokenTest {
 
 	@Test
 	public void createChat() throws WeixinException {
-		ChatInfo chatInfo = new ChatInfo("test", "muzijun", "muzijun","masonxiang","gao");
+		ChatInfo chatInfo = new ChatInfo("test", "jinyu", "jinyu", "jiaolong",
+				"keneng");
 		String chatId = chatApi.createChat(chatInfo);
 		System.err.println(chatId);
-		// 5630e906d4c6e234107c0143
+		// 55c87507d4c64543a62583f7
 	}
 
 	@Test
 	public void getChat() throws WeixinException {
-		ChatInfo chatInfo = chatApi.getChat("5630e906d4c6e234107c0143");
+		ChatInfo chatInfo = chatApi.getChat("55c87507d4c64543a62583f7");
 		System.err.println(chatInfo);
 	}
 
@@ -55,8 +56,8 @@ public class ChatTest extends TokenTest {
 
 	@Test
 	public void sendChatMessage() throws WeixinException {
-		ChatMessage message = new ChatMessage("5630e906d4c6e234107c0143",
-				ChatType.group, "gao", new Text("test"));
+		ChatMessage message = new ChatMessage("55c87507d4c64543a62583f7",
+				ChatType.group, "keneng", new Text("test"));
 		chatApi.sendChatMessage(message);
 	}
 }

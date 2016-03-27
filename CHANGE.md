@@ -445,8 +445,200 @@
   
   + `release`: weixin4j-[mp|qy] upgrade to 1.5.3,weixin4j-server upgrade to 1.0.5
   
- + **weixin4j-[mp|qy]**: 媒体接口类(MediaApi)查询素材接口调整:去掉offset,count替换为Pageable类
+  + **weixin4j-[mp|qy]**: 媒体接口类(MediaApi)查询素材接口调整:去掉offset,count替换为Pageable类
  
 * 2015-08-18
   
- + 比较大的改动:重构了HttpClient部分
+  + 比较大的改动:重构了HttpClient部分
+ 
+* 2015-09-08
+  
+  + weixin4j-mp:新增批量获取用户信息接口
+
+* 2015-09-10
+  
+  + 对Netty-Http-Client的支持
+  
+* 2015-09-11
+
+  + weixin4j-[mp|qy]:version upgrade to 1.6.0
+  
+  + weixin4j-server:version upgrade to 1.1.0
+  
+* 2015-09-16
+
+  + weixin4j-[mp|qy]:version upgrade to 1.6.1
+  
+  + weixin4j-server:version upgrade to 1.1.1
+  
+* 2015-09-21
+
+  + 重要:工程运行环境由jdk1.7调整为jdk1.6
+  
+  + weixin4j-[mp|qy]:version upgrade to 1.6.2
+  
+  + weixin4j-server:version upgrade to 1.1.2
+  
+* 2015-09-27
+
+ + weixin4j-base:新增手动刷新token方法
+ 
+* 2015-10-25
+
+ + weixin4j-server:新增认证通知事件
+ 
+* 2015-11-09
+  
+  + weixin4j-[mp|qy]:version upgrade to 1.6.3
+  
+  + weixin4j-server:version upgrade to 1.1.3
+  
+* 2015-11-20
+
+  + weixin4j-qy:新增客服消息
+  
+* 2015-11-23
+
+  + weixin4j-base:PayException重命名为WeixinPayException
+  
+  + weixin4j-base:调整PayPackageV2构造函数：从主到次
+  
+  + weixin4j-base:调整PayUtil2#createPayJsRequestJsonV2参数位置：从主到次
+  
+  + weixin4j-base:调整MicroPayPackage构造函数：从主到次
+  
+  + weixin4j-base:调整MicroPayPackage构造函数：从主到次
+  
+  + weixin4j-base:调整PayUtil#createPayJsRequestJson参数位置：从主到次
+  
+  + weixin4j-base:调整PayUtil#createNativePayRequestURL参数位置：从主到次
+  
+* 2015-12-04
+
+  + weixin4j-base:【重要】修改PayUtil中的createPayJsRequest方法的返回值为MchPayRequest，便于二次发起支付。
+  
+  + weixin4j-base:【重要】添加MchPayRequest的构造函数，便于二次发起支付。
+  
+  + weixin4j-qy:【重要】第三方应用授权时获取永久授权码覆盖问题。
+  
+* 2015-12-08
+  
+  + weixin4j-[mp|qy]:version upgrade to 1.6.4
+  
+  + weixin4j-server:version upgrade to 1.1.4
+  
+  + weixin4j-base:新增RegexUtil类
+  
+  + weixin4j-base:调整Pay3Api退款方法名为 refundApply
+  
+  + weixin4j-base:调整Pay3Api#refundApply参数个数
+  
+* 2015-12-10
+
+  + 添加可选[RedisTokenStorager](weixin4j-base/src/main/java/com/foxinmy/weixin4j/token/RedisTokenStorager.java)
+  
+  + 添加缓存token时的前缀`wx`
+  
+  + 【特大注意】weixin4j.properties全部的属性名添加`weixin4j`前缀，并用`.`代替原来的`_`
+  
+* 2015-12-15
+  
+  + weixin4j-[mp|qy]:version upgrade to 1.6.5
+  
+* 2015-12-18
+
+  + weixin4j-mp:新增个性化菜单接口
+  
+  + weixin4j-mp:WeixinProxy.getCustomRecord 参数变更为 Date startTime, Date endTime, Pageable pageable
+  
+* 2015-12-19
+
+  + weixin4j-base:删除PayUtil类,接口转移到PayApi类
+  
+* 2015-12-21
+  
+  + weixin4j-server:WeixinMessageHanlder中新增weight接口
+  
+* 2015-12-25
+  
+  + weixin4j-base:WeixinPayProxy类新增获取支付信息#getWeixinAccount方法
+  
+  + weixin4j-base:新增JSSDK的config生成类
+  
+  + weixin4j-base:JSSDKHelper 重命名为 JSSDKConfigurator
+  
+  + weixin4j-base:重构了token类
+  
+  + weixin4j-mp:WeixinProxy新增获取appid(getAppId)方法
+  
+  + weixin4j-mp:WeixinProxy新增获取jsticket(getJSTicketHolder)方法
+  
+  + weixin4j-mp:私有化WeixinProxy(TokenHolder)构造器
+  
+  + weixin4j-mp:调整WeixinTicketCreator类
+  
+  + weixin4j-qy:WeixinProxy新增获取corpid(getCorpId)方法
+  
+  + weixin4j-qy:WeixinProxy新增获取jsticket(getJSTicketHolder)方法
+  
+  + weixin4j-qy:私有化WeixinProxy(TokenHolder)构造器
+  
+  + weixin4j-qy:SuiteApi新增获取Weixinproxy对象(getWeixinProxy)方法
+  
+  + weixin4j-qy:删除WeixinJSTicketCreator类
+  
+  + weixin4j-qy:新增企业号联系人筛选配置类(JSSDKContactConfigurator)
+  
+  + weixin4j-server:DigestUtil 重命名为 DigestUtils
+  
+* 2015-12-26
+  
+  + weixin4j-base:MchPayRequest抽象化
+  
+  + weixin4j-server:WeixinMessageInterceptor加入weight权重接口
+  
+  + weixin4j-server:移入weixin4j下模块化
+  
+  + weixin4j-server:删除无用的工具类并重新整理
+  
+* 2015-12-30
+
+  + weixin4j-qy:新增服务商接口(ProviderApi)
+  
+* 2015-12-31
+
+  + weixin4j-[mp|qy]:version upgrade to 1.6.6
+  
+  + weixin4j-server:version upgrade to 1.1.5
+  
+* 2016-01-20
+
+  + weixin4j-mp:新增获取模板和删除模板接口
+  
+  + weixin4j-mp:新增自定义个性化菜单语言信息匹配项
+  
+* 2016-01-23
+
+  + weixin4j-qy:新增获取客服列表接口
+  
+* 2016-01-24
+
+  + weixin4j-base:新增MemoryTokenStorager(内存保存token)类
+  
+  + weixin4j-base:TokenStorager类新增evict和clear接口
+  
+* 2016-01-26
+
+  + weixin4j-qy:新增上传图文消息内的图片接口
+  
+* 2016-01-29
+
+  + 新增Weixin4jSettings配置类
+  
+* 2016-02-06
+
+  + weixin4j-[mp|qy]:version upgrade to 1.6.7
+  
+  + weixin4j-server:version upgrade to 1.1.6
+  
+  + happy new year(:

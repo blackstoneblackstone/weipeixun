@@ -5,9 +5,14 @@ import top.wexue.common.service.WeixinAPI;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import top.wexue.dao.SchoolDao;
+import top.wexue.model.SessionInfo;
+import top.wexue.utils.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Created by lihb on 9/5/15.
@@ -16,20 +21,29 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/platform")
 public class IndexController {
     @Autowired
+    SchoolDao schoolDao;
+    @Autowired
     WeixinAPI weixinAPI;
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String index() {
         return "platform";
     }
-    @RequestMapping(value = "/home", method = RequestMethod.GET)
-    public String home() {
-        return "home";
-    }
 
-    @RequestMapping(value = "/research", method = RequestMethod.GET)
-    public String research() {
-        return "research";
+    @RequestMapping(value = "/home", method = RequestMethod.GET)
+    public String home(HttpSession session, HttpServletRequest request) {
+        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+        Map<String, Object> school = schoolDao.getSchoolBycorpid(sessionInfo.getCorpid());
+        String schooldesc = "";
+        String schoolnotify = "";
+        if (school != null) {
+            schooldesc = school.get("schooldesc").toString();
+            schoolnotify = school.get("schoolnotify").toString();
+
+        }
+        request.setAttribute("schooldesc", schooldesc);
+        request.setAttribute("schoolnotify", schoolnotify);
+        return "home";
     }
 
     @RequestMapping(value = "/exam", method = RequestMethod.GET)
@@ -52,9 +66,18 @@ public class IndexController {
         return "resource";
     }
 
-    @RequestMapping(value = "/addressbook", method = RequestMethod.GET)
-    public String addressBook(HttpServletRequest request,HttpSession session) {
-        return "addressbook/show";
-    }
 
+    @RequestMapping(value = "/error", method = RequestMethod.GET)
+    public String error(int type) {
+        if (type == 403) {
+            return "error403";
+        }
+        if (type == 404) {
+            return "error404";
+        }
+        if (type == 405) {
+            return "error405";
+        }
+        return "error500";
+    }
 }

@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import com.foxinmy.weixin4j.exception.WeixinException;
 import com.foxinmy.weixin4j.handler.WeixinMessageHandler;
+import com.foxinmy.weixin4j.request.WeixinMessage;
 import com.foxinmy.weixin4j.request.WeixinRequest;
 import com.foxinmy.weixin4j.response.WeixinResponse;
 
@@ -13,7 +14,7 @@ import com.foxinmy.weixin4j.response.WeixinResponse;
  * @className WeixinMessageInterceptor
  * @author jy
  * @date 2015年5月7日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see MessageInterceptorAdapter
  */
 public interface WeixinMessageInterceptor {
@@ -33,7 +34,7 @@ public interface WeixinMessageInterceptor {
 	 * @throws WeixinException
 	 */
 	boolean preHandle(ChannelHandlerContext context, WeixinRequest request,
-			Object message, WeixinMessageHandler handler)
+			WeixinMessage message, WeixinMessageHandler handler)
 			throws WeixinException;
 
 	/**
@@ -52,7 +53,7 @@ public interface WeixinMessageInterceptor {
 	 * @throws WeixinException
 	 */
 	void postHandle(ChannelHandlerContext context, WeixinRequest request,
-			WeixinResponse response, Object message,
+			WeixinResponse response, WeixinMessage message,
 			WeixinMessageHandler handler) throws WeixinException;
 
 	/**
@@ -71,7 +72,14 @@ public interface WeixinMessageInterceptor {
 	 * @throws WeixinException
 	 */
 	void afterCompletion(ChannelHandlerContext context, WeixinRequest request,
-			WeixinResponse response, Object message,
+			WeixinResponse response, WeixinMessage message,
 			WeixinMessageHandler handler, Exception exception)
 			throws WeixinException;
+
+	/**
+	 * 用于匹配到多个MessageHandler时权重降序排列,数字越大优先级越高
+	 * 
+	 * @return 权重
+	 */
+	int weight();
 }

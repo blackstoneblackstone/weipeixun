@@ -8,10 +8,11 @@ import java.nio.charset.Charset;
  * @className Consts
  * @author jy
  * @date 2014年12月3日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public final class Consts {
+	public static final String WEIXIN4J = "weixin4j";
 	public static final Charset UTF_8 = Charset.forName("UTF-8");
 	public static final Charset GBK = Charset.forName("GBK");
 	public static final String SUCCESS = "SUCCESS";

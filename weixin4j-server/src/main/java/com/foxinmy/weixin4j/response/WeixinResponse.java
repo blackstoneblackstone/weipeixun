@@ -1,12 +1,13 @@
 package com.foxinmy.weixin4j.response;
 
+
 /**
  * 微信被动消息回复
  * 
  * @className WeixinResponse
  * @author jy
  * @date 2015年5月5日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see TextResponse
  * @see ImageResponse
  * @see MusicResponse

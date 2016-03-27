@@ -6,7 +6,7 @@ package com.foxinmy.weixin4j.type;
  * @className EventType
  * @author jy
  * @date 2014年9月30日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public enum EventType {
@@ -113,7 +113,31 @@ public enum EventType {
 	 * @see com.foxinmy.weixin4j.mp.event.KfSwitchEventMessage
 	 */
 	kf_switch_session,
-	
+	/**
+	 * 资质认证成功事件
+	 */
+	qualification_verify_success,
+	/**
+	 * 资质认证失败事件
+	 */
+	qualification_verify_fail,
+	/**
+	 * 名称认证成功事件
+	 */
+	naming_verify_success,
+	/**
+	 * 名称认证失败事件
+	 */
+	naming_verify_fail,
+	/**
+	 * 年审通知事件
+	 */
+	annual_renew,
+	/**
+	 * 认证过期失效通知
+	 */
+	verify_expired,
+
 	// ------------------------------企业号特有------------------------------
 	/**
 	 * 异步任务完成事件
@@ -126,5 +150,10 @@ public enum EventType {
 	 * 
 	 * @see com.foxinmy.weixin4j.qy.event.EnterAgentEventMessage
 	 */
-	enter_agent;
+	enter_agent,
+	/**
+	 * 第三方应用套件消息
+	 * @see com.foxinmy.weixin4j.qy.suite.WeixinSuiteMessage
+	 */
+	suite;
 }

@@ -3,428 +3,260 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
+    String path = request.getContextPath();
+    String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
 %>
-<!DOCTYPE html>
-<html lang="zh-cn">
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="keywords" content="天天微学,微信,移动办公">
-  <meta name="description" content="">
-  <title>登陆-天天微学</title>
-  <script src="<%=basePath%>/js/jquery.min.js"></script>
-  <script src="<%=basePath%>/js/jquery.form.js"></script>
-  <style>
-    body {
-      margin: 0px;
-    }
+    <title>登陆-天天微学</title>
+    <meta charset="utf-8">
+    <style type="text/css">
 
-    a {
-      text-decoration: none;
-    }
-
-    .index_text:hover {
-      color: green;
-      background-color: white;
-    }
-
-    .logo {
-      margin-left: 100px;
-    }
-    .footer {
-      background-color: #f4f3f3;
-      border-top: solid #dddddd 1px;
-      height: 50px;
-      bottom: 0px;
-      padding-top: 20px;
-      width: 100%;
-      color: #f87b00;
-    }
-
-    .index {
-      float: right;
-      margin-top: 15px;
-      margin-right: 200px;
-    }
-
-    .header {
-      background-color: rgba(250, 250, 250, 0.9);
-      height: 69px;
-      width: 100%;
-      z-index: 999;
-      top: 0px;
-      border-bottom: 1px solid #dcdbdb;
-    }
-
-    .mind-container {
-      height: 500px;
-      width: 100%;
-      background: url(/img/cms/bg_qy.jpg) repeat-y;
-    }
-
-    .login_box {
-      width: 300px;
-      height: auto;
-      float: right;
-      margin-top: 50px;
-      margin-right: 100px;
-      border: solid #cccccc 1px;
-      background-color: white;
-      border-radius: 5px;
-      padding: 20px;
-    }
-
-    input {
-      border: solid green 1px;
-      height: 30px;
-      width: 280px;
-      margin-bottom: 20px;
-      border-radius: 3px;
-    }
-
-    .login_btn {
-      width: 280px;
-      background-color: green;
-      height: 40px;
-      border: solid #ececec 1px;
-      color: white;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .login_btn:hover {
-      background-color: white;
-      color: green;
-      border: solid green 1px;
-    }
-
-    .ff {
-      font-size: 12px;
-      color: green;
-      margin-bottom: 10px;
-    }
-
-    .admin {
-      color: green;
-    }
-
-    .reg_box {
-      width: 300px;
-      height: auto;
-      float: right;
-      margin-top: 50px;
-      margin-right: 100px;
-      border: solid #cccccc 1px;
-      background-color: white;
-      border-radius: 5px;
-      padding: 20px;
-      color: #f87b00;
-    }
-
-    .reg_box input {
-      border: solid #f87b00 1px;
-    }
-
-    .reg_btn {
-      width: 280px;
-      background-color: #f87b00;
-      height: 40px;
-      border: solid #ececec 1px;
-      color: white;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .reg_btn:hover {
-      background-color: white;
-      color: #f87b00;
-      border: solid #f87b00 1px;
-    }
-     html * {
-            -webkit-font-smoothing: antialiased;
-            font-family: "Lantinghei SC", "Open Sans", Arial, "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "STHeiti", "WenQuanYi Micro Hei", SimSun, sans-serif;
+        body {
+            background-color: #326696;
+            margin: 0px;
+            overflow: hidden;
+            font-family: Monospace;
+            font-size: 13px;
+            text-align: center;
+            font-weight: bold;
+            text-align: center;
         }
-  </style>
+
+        a {
+            color: #0078ff;
+        }
+
+        .login {
+            width: 40%;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.5);
+            position: absolute;
+            top: 15%;
+            border-radius: 50%;
+            left: 30%;
+            border: solid #CCCCCC 1px;
+        }
+
+        .login-text {
+            width: 200px;
+            margin-top: 20%;
+            border: solid #CCCCCC 1px;
+        }
+        .login-btn{
+            width: 80%;
+            margin-top: 30px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: cadetblue;
+            margin-left: 10%;
+            color: #FFFFFF;
+            line-height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .login-btn:hover{
+            background-color: #CCCCCC;
+        }
+
+    </style>
 </head>
 <body>
-<div class="header">
-  <div style="height: 5px;background-color:green;"></div>
-  <a href="http://www.wexue.top" class="logo" target="_blank">
-    <img src="<%=basePath%>/img/logo.png" style="height: 65px;" alt="">
-  </a>
-
-  <div class="index">
-    <a href="http://www.wexue.top" target="_blank">
-      <div class="index_text"
-           style="padding: 10px 20px 10px 20px;background-color: green;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;color: white ">
-        官网
-      </div>
-    </a>
-  </div>
-</div>
-<div class="mind-container">
-  <div class="login_box">
-    <h2><span class="admin">管理员</span></h2>
-
-    <form id="form_login" action="/user/login" method="post"
-          autocomplete="off">
-      <div id="idInputLine" class="loginFormIpt"><b class="ico ico-uid-mail"></b>
-        <input class="loginFormTdIpt search-input" tabindex="1" title="请输入账号"
-               placeholder="请输入账号" onkeydown="onKeyUp(event)" name="username" id="username"
-               type="text" maxlength="50" value="admin" autocomplete="on"
-               valid="{&quot;must&quot;:true,&quot;tip&quot;:&quot;帐号&quot;}"><span
-                class="input_colse"></span>
-      </div>
-      <div id="pwdInputLine" class="loginFormIpt"><b class="ico ico-pwd"></b>
-        <input class="loginFormTdIpt search-input" tabindex="2" title="请输入密码"
-               placeholder="请输入密码" value="admin" name="password" id="password" type="password"
-               onkeydown="onKeyUp(event)">
-      </div>
-      <div id="login_state" style="color: red;padding-bottom:5px;font-size: 14px;">
-
-      </div>
-      <div>
-        <div class="ff">
-          <a class="fl"
-             href="http://qy.do1.com.cn/qwy/qiweipublicity/experience2/Retrieve1.jsp">忘记密码？</a>
-          还没有帐号？
-          <%--<span--%>
-                <%--style="color:#f87b00;cursor: pointer" id="regBtn">马上开通&gt;</span>--%>
-        </div>
-      </div>
-      <div>
-        <button class="login_btn" type="button" onclick="doLogin()">登录
-        </button>
-        <button class="login_btn" type="button" onclick="doQYLogin()">企业号授权登录
-        </button>
-      </div>
-    </form>
-  </div>
-  <div class="reg_box" hidden>
-    <h2><span>注册</span></h2>
-
-    <form id="form_reg" action="/user/reg" method="post"
-          autocomplete="off">
-      <div class="loginFormIpt"><b class="ico ico-uid-mail"></b>
-        <input class="loginFormTdIpt search-input" tabindex="1" title="请输入账号"
-               placeholder="请输入账号" onkeydown="onKeyUp(event)" name="rusername"
-               type="text" maxlength="50" value="admin" autocomplete="on"
-               valid="{&quot;must&quot;:true,&quot;tip&quot;:&quot;帐号&quot;}"><span
-                class="input_colse"></span>
-      </div>
-      <div class="loginFormIpt"><b class="ico ico-pwd"></b>
-        <input class="loginFormTdIpt search-input" tabindex="2" title="请输入密码"
-               placeholder="请输入密码" name="rpassword" type="password"
-               onkeydown="onKeyUp(event)">
-      </div>
-      <div class="loginFormIpt"><b class="ico ico-pwd"></b>
-        <input class="loginFormTdIpt search-input" tabindex="2" title="请输入手机号"
-               placeholder="手机号" name="tel" type="text"
-               onkeydown="onKeyUp(event)">
-      </div>
-      <div id="reg_state" style="color: red;padding-bottom:5px;font-size: 14px;">
-
-      </div>
-      <div>
-        <div class="ff">
-          有帐号？<span
-                style="color:#f87b00;cursor: pointer" id="loginBtn">立即登录&gt;</span>
-        </div>
-      </div>
-      <div>
-        <button class="reg_btn" type="button" onclick="doReg()">免费体验
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-<div class="footer">
-  <a href="" target="_blank">关于我们</a>&nbsp;&nbsp;|&nbsp;&nbsp;咨询电话：18612055774&nbsp;&nbsp;|&nbsp;&nbsp;Copyright©2014-2015
-  lihb All Rights Reserved 粤B2-20062018号
-</div>
-</div>
 
 
-<script type="text/javascript">
-  var login_type = 1;
-  $(function () {
-    $('#username').focus();
-    $('#idInputLine').addClass('focus');
-    //高度自适应
-    function juzhong() {
-      var mttop = ($(window).height() - $('.frontHome.page').height() - 20) / 2
-      if (mttop < 0) {
-        mttop = 0
-      }
-      $('.frontHome.page').css('marginTop', mttop);
-    }
+<script type="text/javascript" src="<%=basePath%>/js/ThreeWebGL.js"></script>
+<script type="text/javascript" src="<%=basePath%>/js/ThreeExtras.js"></script>
 
-    $("#regBtn").click(function () {
-      $(".login_box").hide();
-      $(".reg_box").show();
-    });
-    $("#loginBtn").click(function () {
-      $(".login_box").show();
-      $(".reg_box").hide();
-    });
+<script type="text/javascript" src="<%=basePath%>/js/Detector.js"></script>
+<script type="text/javascript" src="<%=basePath%>/js/RequestAnimationFrame.js"></script>
 
-    juzhong();
-    $(window).resize(function () {
-      juzhong();
-    })
-    //登录框效果
-    $('.loginFormTdIpt').focus(function () {
-      $(this).parent('.loginFormIpt').addClass('focus')
-    }).blur(function () {
-      $(this).parent('.loginFormIpt').removeClass('focus')
-    })
-    // 登录框清空文字
-    $('.search-input').on('input click', function (event) {
-      var input_colse = $('<span class="input_colse"></span>');
-      if ($(this).val().length > 0) {
-        $('.input_colse').remove();
-        $(this).after(input_colse)
-      } else {
-        $('.input_colse').remove();
-      }
-      $('.input_colse').on('click', function () {
-        $(this).prev('.search-input').val('');
-        $(this).remove();
-      })
-    })
-    //菜单更多弹出层
-    $('#nav_more').mouseover(function () {
-      $(this).children('.hide_nav').show();
-    }).mouseout(function () {
-      $(this).children('.hide_nav').hide();
-    })
+<script id="vs" type="x-shader/x-vertex">
 
-  })
-  function onKeyUp(event) {
-    var e = event ? event : (window.event ? window.event : null);
-    if (e.keyCode == 13)doLogin(login_type);
-  }
-  function doQYLogin(){
-    window.location.href="https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=wxf54e1b5e0b62fa96&redirect_uri=http://www.wexue.top/auth&state=weipeixun";
-  }
-  function doLogin() {
-    //autoApply();//暂时去掉记住账号的功能
+			varying vec2 vUv;
 
-    //var dqdp = new Dqdp();
-    //个人网页版
-    if ($("#username").val() == "") {
-      alert("请输入账号");
-      return;
-    }
-    if ($("#password").val() == "") {
-      alert("请输入密码");
-      return;
-    }
-    $('#form_login').ajaxSubmit({
-      url: "<%=basePath%>/user/login",
-      dataType: "text",
-      success: function (data) {
-        var json= $.parseJSON(data);
-        if (json.success) {
-          window.top.location.href="${handlerUrl}";
-        } else {
-          $("#login_state").text(json.msg);
-        }
-      }
-    });
-  }
-  function doReg() {
-    //autoApply();//暂时去掉记住账号的功能
+			void main() {
 
-    //var dqdp = new Dqdp();
-    //个人网页版
-    if ($("#rusername").val() == "") {
-      alert("请输入账号");
-      return;
-    }
-    if ($("#rpassword").val() == "") {
-      alert("请输入密码");
-      return;
-    }
-    $('#form_reg').ajaxSubmit({
-      url: "/user/reg",
-      dataType: "text",
-      success: function (data) {
-        var json= $.parseJSON(data);
-        if (json.success) {
-          $("#reg_state").text(json.msg);
-        } else {
-          $("#reg_state").text(json.msg);
-        }
-      }
-    });
-  }
-  /**
-   *将用户的帐号信息放入cookie中
-   */
-  function autoApply() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-    var f1 = $("#username").val();
-    var f2 = $("#password").val();
-    var expiresDate = new Date();
-    expiresDate.setTime(expiresDate.getTime() + (30 * 24 * 60 * 60 * 1000));
-
-    /**  不记住密码
-     var jsonData={fielda:f1,fieldb:f2};*/
-    var jsonData = {fielda: f1};
-
-    $.cookie.json = true;
-    if ($("#ckAutoLogin")[0].checked) {
-      $.cookie("_do1@xyh_", jsonData, {path: '/', expires: expiresDate});
-      $.cookie("_do1@xyh_Logout", "false", {path: '/', expires: expiresDate});
-    }
-    else {
-      $.cookie("_do1@xyh_", {fielda: '', fieldb: ''}, {path: '/', expires: expiresDate});
-    }
+			}
 
 
-  }
-
-  /**
-   *验证是否为企业微信网页版用户登录
-   */
-  function checkWeixinUser() {
-    var isNotCheck = true;
-    $("#gerenban").attr("action", "/qwy/portal/userLoginAction!checkUser.action");
-    $("#gerenban").ajaxSubmit({
-      dataType: 'json',
-      async: false,
-      success: function (result) {
-        if (result.code == "0") {
-          isNotCheck = false;
-
-          window.top.location.href = "/qwy/qwweb/main.jsp";
-
-          //验证通过，需要form提交到后台登录并重定向页面
-          //$("#id_form_login").attr("action", "/qwy/portal/userLoginAction!weixinWebLogin.action");
-          //$("#id_form_login").submit();
-        }
-        else {
-          isNotCheck = false;
-          $("#gerenban_pass").val("");
-          _alert("提示信息", result.desc);
-        }
-      },
-      error: function () {
-      }
-    });
-    $("#org_edit").attr("action", "/qwy/j_spring_security_check");
-    return isNotCheck;
-
-  }
-  function removeUpdate0424() {
-    $('.Update0424').fadeOut(600);
-    $('#overlayDiv').hide();
-  }
 
 </script>
+
+<script id="fs" type="x-shader/x-fragment">
+
+			uniform sampler2D map;
+
+			uniform vec3 fogColor;
+			uniform float fogNear;
+			uniform float fogFar;
+
+			varying vec2 vUv;
+
+			void main() {
+
+				float depth = gl_FragCoord.z / gl_FragCoord.w;
+				float fogFactor = smoothstep( fogNear, fogFar, depth );
+
+				gl_FragColor = texture2D( map, vUv );
+				gl_FragColor.w *= pow( gl_FragCoord.z, 20.0 );
+				gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+
+			}
+
+
+
+</script>
+
+<script type="text/javascript">
+
+    if (!Detector.webgl) Detector.addGetWebGLMessage();
+
+    // Bg gradient
+
+    var canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = window.innerHeight;
+
+    var context = canvas.getContext('2d');
+
+    var gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, "#1e4877");
+    gradient.addColorStop(0.5, "#4584b4");
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    document.body.style.background = 'url(' + canvas.toDataURL('image/png') + ')';
+
+    // Clouds
+
+    var container;
+    var camera, scene, renderer, sky, mesh, geometry, material,
+            i, h, color, colors = [], sprite, size, x, y, z;
+
+    var mouseX = 0, mouseY = 0;
+    var start_time = new Date().getTime();
+
+    var windowHalfX = window.innerWidth / 2;
+    var windowHalfY = window.innerHeight / 2;
+
+    init();
+    animate();
+
+    function init() {
+
+        container = document.createElement('div');
+        document.body.appendChild(container);
+
+        camera = new THREE.Camera(30, window.innerWidth / window.innerHeight, 1, 3000);
+        camera.position.z = 6000;
+
+        scene = new THREE.Scene();
+
+        geometry = new THREE.Geometry();
+
+        var texture = THREE.ImageUtils.loadTexture('<%=basePath%>/img/cms/cloud10.png');
+        texture.magFilter = THREE.LinearMipMapLinearFilter;
+        texture.minFilter = THREE.LinearMipMapLinearFilter;
+
+        var fog = new THREE.Fog(0x4584b4, -100, 3000);
+
+        material = new THREE.MeshShaderMaterial({
+
+            uniforms: {
+
+                "map": {type: "t", value: 2, texture: texture},
+                "fogColor": {type: "c", value: fog.color},
+                "fogNear": {type: "f", value: fog.near},
+                "fogFar": {type: "f", value: fog.far}
+
+            },
+            vertexShader: document.getElementById('vs').textContent,
+            fragmentShader: document.getElementById('fs').textContent,
+            depthTest: false
+
+        });
+
+        var plane = new THREE.Mesh(new THREE.Plane(64, 64));
+
+        for (i = 0; i < 8000; i++) {
+
+            plane.position.x = Math.random() * 1000 - 500;
+            plane.position.y = -Math.random() * Math.random() * 200 - 15;
+            plane.position.z = i;
+            plane.rotation.z = Math.random() * Math.PI;
+            plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
+
+            GeometryUtils.merge(geometry, plane);
+
+        }
+
+        mesh = new THREE.Mesh(geometry, material);
+        scene.addObject(mesh);
+
+        mesh = new THREE.Mesh(geometry, material);
+        mesh.position.z = -8000;
+        scene.addObject(mesh);
+
+        renderer = new THREE.WebGLRenderer({antialias: false});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        document.addEventListener('mousemove', onDocumentMouseMove, false);
+        window.addEventListener('resize', onWindowResize, false);
+
+    }
+
+    function onDocumentMouseMove(event) {
+
+        mouseX = ( event.clientX - windowHalfX ) * 0.25;
+        mouseY = ( event.clientY - windowHalfY ) * 0.15;
+
+    }
+
+    function onWindowResize(event) {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+    }
+
+    function animate() {
+
+        requestAnimationFrame(animate);
+        render();
+
+    }
+
+    function render() {
+
+        position = ( ( new Date().getTime() - start_time ) * 0.03 ) % 8000;
+
+        camera.position.x += ( mouseX - camera.target.position.x ) * 0.01;
+        camera.position.y += ( -mouseY - camera.target.position.y ) * 0.01;
+        camera.position.z = -position + 8000;
+
+        camera.target.position.x = camera.position.x;
+        camera.target.position.y = camera.position.y;
+        camera.target.position.z = camera.position.z - 1000;
+
+        renderer.render(scene, camera);
+
+    }
+    function doQYLogin(){
+        window.location.href="https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=wxf54e1b5e0b62fa96&redirect_uri=http%3A%2F%2Fwww.wexue.top%2Fauth%2Flogin";
+    }
+
+</script>
+<div class="login">
+    <img class="login-text" src="<%=basePath%>/img/logo.png">
+    <div class="login-btn" onclick="doQYLogin()">企业号授权登陆</div>
+</div>
 </body>
 </html>

@@ -16,6 +16,8 @@ import com.foxinmy.weixin4j.qy.model.User;
 import com.foxinmy.weixin4j.qy.type.InviteType;
 import com.foxinmy.weixin4j.qy.type.UserStatus;
 import com.foxinmy.weixin4j.token.TokenHolder;
+import com.foxinmy.weixin4j.util.NameValue;
+import com.foxinmy.weixin4j.util.StringUtil;
 
 /**
  * 成员API
@@ -23,10 +25,11 @@ import com.foxinmy.weixin4j.token.TokenHolder;
  * @className UserApi
  * @author jy
  * @date 2014年11月19日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see com.foxinmy.weixin4j.qy.model.User
- * @see <a
- *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98">管理成员说明</a>
+ * @see <a href=
+ *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98">
+ *      管理成员说明</a>
  */
 public class UserApi extends QyApi {
 	private final MediaApi mediaApi;
@@ -43,8 +46,9 @@ public class UserApi extends QyApi {
 	 * @param user
 	 *            成员对象
 	 * @see com.foxinmy.weixin4j.qy.model.User
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E5.88.9B.E5.BB.BA.E6.88.90.E5.91.98">创建成员说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E5.88.9B.E5.BB.BA.E6.88.90.E5.91.98">
+	 *      创建成员说明</a>
 	 * @return 处理结果
 	 * @throws WeixinException
 	 */
@@ -59,10 +63,11 @@ public class UserApi extends QyApi {
 	 * @param user
 	 *            成员对象
 	 * @param avatar
-	 *            头像文件
+	 *            头像文件 可为空
 	 * @see com.foxinmy.weixin4j.qy.model.User
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E5.88.9B.E5.BB.BA.E6.88.90.E5.91.98">创建成员说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E5.88.9B.E5.BB.BA.E6.88.90.E5.91.98">
+	 *      创建成员说明</a>
 	 * @return 处理结果
 	 * @throws WeixinException
 	 */
@@ -78,8 +83,9 @@ public class UserApi extends QyApi {
 	 * @param user
 	 *            成员对象
 	 * @see com.foxinmy.weixin4j.qy.model.User
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E6.9B.B4.E6.96.B0.E6.88.90.E5.91.98">更新成员说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E6.9B.B4.E6.96.B0.E6.88.90.E5.91.98">
+	 *      更新成员说明</a>
 	 * @return 处理结果
 	 * @throws WeixinException
 	 */
@@ -96,8 +102,9 @@ public class UserApi extends QyApi {
 	 * @param avatar
 	 *            头像文件
 	 * @see com.foxinmy.weixin4j.qy.model.User
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E6.9B.B4.E6.96.B0.E6.88.90.E5.91.98">更新成员说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E6.9B.B4.E6.96.B0.E6.88.90.E5.91.98">
+	 *      更新成员说明</a>
 	 * @return 处理结果
 	 * @throws WeixinException
 	 */
@@ -110,11 +117,15 @@ public class UserApi extends QyApi {
 	private JsonResult excute(String uri, User user, InputStream avatar)
 			throws WeixinException {
 		JSONObject obj = (JSONObject) JSON.toJSON(user);
-		Object extattr = obj.remove("extattr");
-		if (extattr != null) {
+		Object val = obj.remove("extattr");
+		if (val != null) {
 			JSONObject attrs = new JSONObject();
-			attrs.put("attrs", extattr);
+			attrs.put("attrs", val);
 			obj.put("extattr", attrs);
+		}
+		val = obj.remove("status");
+		if (val != null) {
+			obj.put("enable", val);
 		}
 		if (avatar != null) {
 			obj.put("avatar_mediaid", mediaApi.uploadMedia(0, avatar, null));
@@ -133,26 +144,29 @@ public class UserApi extends QyApi {
 	 * @param userid
 	 *            成员唯一ID
 	 * @see com.foxinmy.weixin4j.qy.model.User
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E8.8E.B7.E5.8F.96.E6.88.90.E5.91.98">获取成员说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E8.8E.B7.E5.8F.96.E6.88.90.E5.91.98">
+	 *      获取成员说明</a>
 	 * @return 成员对象
 	 * @throws WeixinException
 	 */
 	public User getUser(String userid) throws WeixinException {
 		String user_get_uri = getRequestUri("user_get_uri");
 		Token token = tokenHolder.getToken();
-		WeixinResponse response = weixinExecutor.get(String.format(user_get_uri,
-				token.getAccessToken(), userid));
+		WeixinResponse response = weixinExecutor.get(String.format(
+				user_get_uri, token.getAccessToken(), userid));
 		JSONObject obj = response.getAsJson();
-		Object attrs = obj.getJSONObject("extattr").remove("attrs");
+		Object attrs = obj.remove("extattr");
+		User user = JSON.toJavaObject(obj, User.class);
 		if (attrs != null) {
-			obj.put("extattr", attrs);
+			user.setExtattr(JSON.parseArray(
+					((JSONObject) attrs).getString("attrs"), NameValue.class));
 		}
-		return JSON.toJavaObject(obj, User.class);
+		return user;
 	}
 
 	/**
-	 * code获取userid(管理员须拥有agent的使用权限；agentid必须和跳转链接时所在的企业应用ID相同。)
+	 * 根据code获取用户信息
 	 * 
 	 * @param code
 	 *            通过员工授权获取到的code，每次员工授权带上的code将不一样，code只能使用一次，5分钟未被使用自动过期
@@ -160,14 +174,46 @@ public class UserApi extends QyApi {
 	 * @return 成员对象
 	 * @see {@link #getUser(String)}
 	 * @see {@link #getUserIdByCode(String,int)}
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E4%BC%81%E4%B8%9A%E8%8E%B7%E5%8F%96code">企业获取code</a>
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E6%A0%B9%E6%8D%AEcode%E8%8E%B7%E5%8F%96%E6%88%90%E5%91%98%E4%BF%A1%E6%81%AF">根据code获取成员信息</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=OAuth%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3">
+	 *      oauth授权获取用户信息</a>
 	 * @throws WeixinException
 	 */
 	public User getUserByCode(String code) throws WeixinException {
-		return getUser(getUserIdByCode(code).getString("UserId"));
+		String[] userIds = getUserIdByCode(code);
+		if (Boolean.parseBoolean(userIds[2])) {
+			return getUser(openid2userid(userIds[0]));
+		} else {
+			return getUser(userIds[0]);
+		}
+	}
+
+	/**
+	 * 根据code获取成员ID信息
+	 * 
+	 * @param code
+	 *            通过员工授权获取到的code，每次员工授权带上的code将不一样，code只能使用一次，5分钟未被使用自动过期
+	 * @return 两个元素的数组 <font color="red">第一个元素为userId或者openId
+	 *         第二个元素为deviceId</font>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=OAuth%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3">
+	 *      oauth授权获取用户信息</a>
+	 * @throws WeixinException
+	 */
+	public String[] getUserIdByCode(String code) throws WeixinException {
+		String user_getid_uri = getRequestUri("user_getid_uri");
+		Token token = tokenHolder.getToken();
+		WeixinResponse response = weixinExecutor.get(String.format(
+				user_getid_uri, token.getAccessToken(), code));
+		JSONObject result = response.getAsJson();
+		String userId = result.getString("UserId");
+		boolean need2 = false;
+		if (StringUtil.isBlank(userId)) {
+			userId = result.getString("OpenId");
+			need2 = true;
+		}
+		return new String[] { userId, result.getString("DeviceId"),
+				Boolean.toString(need2) };
 	}
 
 	/**
@@ -178,8 +224,9 @@ public class UserApi extends QyApi {
 	 * @param authCode
 	 *            oauth2.0授权企业号管理员登录产生的code
 	 * @return 登陆信息
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E8%8E%B7%E5%8F%96%E4%BC%81%E4%B8%9A%E7%AE%A1%E7%90%86%E5%91%98%E7%99%BB%E5%BD%95%E4%BF%A1%E6%81%AF">授权获取企业号管理员登录信息</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E8%8E%B7%E5%8F%96%E4%BC%81%E4%B8%9A%E7%AE%A1%E7%90%86%E5%91%98%E7%99%BB%E5%BD%95%E4%BF%A1%E6%81%AF">
+	 *      授权获取企业号管理员登录信息</a>
 	 * @see com.foxinmy.weixin4j.qy.model.OUserInfo
 	 * @throws WeixinException
 	 */
@@ -193,26 +240,6 @@ public class UserApi extends QyApi {
 	}
 
 	/**
-	 * 根据code获取成员信息
-	 * 
-	 * @param code
-	 *            通过员工授权获取到的code，每次员工授权带上的code将不一样，code只能使用一次，5分钟未被使用自动过期
-	 * @return { "UserId":"USERID", "DeviceId":"DEVICEID" }
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/indexo.php?title=%E4%BC%81%E4%B8%9A%E8%8E%B7%E5%8F%96code">企业获取code</a>
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E6%A0%B9%E6%8D%AEcode%E8%8E%B7%E5%8F%96%E6%88%90%E5%91%98%E4%BF%A1%E6%81%AF">根据code获取成员信息</a>
-	 * @throws WeixinException
-	 */
-	public JSONObject getUserIdByCode(String code) throws WeixinException {
-		String user_getid_uri = getRequestUri("user_getid_uri");
-		Token token = tokenHolder.getToken();
-		WeixinResponse response = weixinExecutor.get(String.format(
-				user_getid_uri, token.getAccessToken(), code));
-		return response.getAsJson();
-	}
-
-	/**
 	 * 获取部门成员
 	 * 
 	 * @param partyId
@@ -220,12 +247,13 @@ public class UserApi extends QyApi {
 	 * @param fetchChild
 	 *            是否递归获取子部门下面的成员 非必须
 	 * @param userStatus
-	 *            成员状态 status可叠加 非必须
+	 *            成员状态 status可叠加 非必须 未填写则默认为未关注(4)
 	 * @param findDetail
 	 *            是否获取详细信息
 	 * @see com.foxinmy.weixin4j.qy.model.User
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E8.8E.B7.E5.8F.96.E9.83.A8.E9.97.A8.E6.88.90.E5.91.98">获取部门成员说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E8.8E.B7.E5.8F.96.E9.83.A8.E9.97.A8.E6.88.90.E5.91.98">
+	 *      获取部门成员说明</a>
 	 * @return 成员列表
 	 * @throws WeixinException
 	 */
@@ -234,6 +262,9 @@ public class UserApi extends QyApi {
 		String user_list_uri = findDetail ? getRequestUri("user_list_uri")
 				: getRequestUri("user_slist_uri");
 		Token token = tokenHolder.getToken();
+		if (userStatus == null) {
+			userStatus = UserStatus.UNFOLLOW;
+		}
 		WeixinResponse response = weixinExecutor.get(String.format(
 				user_list_uri, token.getAccessToken(), departId, fetchChild ? 1
 						: 0, userStatus.getVal()));
@@ -243,12 +274,14 @@ public class UserApi extends QyApi {
 			list = new ArrayList<User>(arrays.size());
 			for (int i = 0; i < arrays.size(); i++) {
 				JSONObject obj = arrays.getJSONObject(i);
-				JSONObject ex = obj.getJSONObject("extattr");
-				Object attrs = null;
-				if (ex != null && (attrs = ex.remove("attrs")) != null) {
-					obj.put("extattr", attrs);
+				Object attrs = obj.remove("extattr");
+				User user = JSON.toJavaObject(obj, User.class);
+				if (attrs != null) {
+					user.setExtattr(JSON.parseArray(
+							((JSONObject) attrs).getString("attrs"),
+							NameValue.class));
 				}
-				list.add(JSON.toJavaObject(obj, User.class));
+				list.add(user);
 			}
 		} else {
 			list = JSON.parseArray(response.getAsJson().getString("userlist"),
@@ -275,8 +308,9 @@ public class UserApi extends QyApi {
 	 * 
 	 * @param userid
 	 *            成员ID
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E5.88.A0.E9.99.A4.E6.88.90.E5.91.98">删除成员说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E5.88.A0.E9.99.A4.E6.88.90.E5.91.98">
+	 *      删除成员说明</a>
 	 * @return 处理结果
 	 * @throws WeixinException
 	 */
@@ -316,8 +350,9 @@ public class UserApi extends QyApi {
 	 * @param userid
 	 *            成员ID
 	 * @return 调用结果
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E5%85%B3%E6%B3%A8%E4%B8%8E%E5%8F%96%E6%B6%88%E5%85%B3%E6%B3%A8">二次验证说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E5%85%B3%E6%B3%A8%E4%B8%8E%E5%8F%96%E6%B6%88%E5%85%B3%E6%B3%A8">
+	 *      二次验证说明</a>
 	 * @throws WeixinException
 	 */
 	public JsonResult authsucc(String userId) throws WeixinException {
@@ -336,8 +371,9 @@ public class UserApi extends QyApi {
 	 * @param tips
 	 *            推送到微信上的提示语（只有认证号可以使用）。当使用微信推送时，该字段默认为“请关注XXX企业号”，邮件邀请时，该字段无效。
 	 * @return 邀请类型
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E9.82.80.E8.AF.B7.E6.88.90.E5.91.98.E5.85.B3.E6.B3.A8">邀请成员关注说明</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98#.E9.82.80.E8.AF.B7.E6.88.90.E5.91.98.E5.85.B3.E6.B3.A8">
+	 *      邀请成员关注说明</a>
 	 * @throws WeixinException
 	 */
 	public InviteType inviteUser(String userId, String tips)
@@ -370,8 +406,9 @@ public class UserApi extends QyApi {
 	 *            需要发送红包的应用ID，若只是使用微信支付和企业转账，则无需该参数 传入0或负数则忽略
 	 * @return 结果数组 第一个元素为对应的openid 第二个元素则为应用的appid(如果有)
 	 * @throws WeixinException
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=Userid%E4%B8%8Eopenid%E4%BA%92%E6%8D%A2%E6%8E%A5%E5%8F%A3">userid转换成openid</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=Userid%E4%B8%8Eopenid%E4%BA%92%E6%8D%A2%E6%8E%A5%E5%8F%A3">
+	 *      userid转换成openid</a>
 	 */
 	public String[] userid2openid(String userid, int agentid)
 			throws WeixinException {
@@ -396,8 +433,9 @@ public class UserApi extends QyApi {
 	 *            在使用微信支付、微信红包和企业转账之后，返回结果的openid
 	 * @return 该openid在企业号中对应的成员userid
 	 * @throws WeixinException
-	 * @see <a
-	 *      href="http://qydev.weixin.qq.com/wiki/index.php?title=Userid%E4%B8%8Eopenid%E4%BA%92%E6%8D%A2%E6%8E%A5%E5%8F%A3">openid转换成userid</a>
+	 * @see <a href=
+	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=Userid%E4%B8%8Eopenid%E4%BA%92%E6%8D%A2%E6%8E%A5%E5%8F%A3">
+	 *      openid转换成userid</a>
 	 */
 	public String openid2userid(String openid) throws WeixinException {
 		String openid2userid_uri = getRequestUri("openid2userid_uri");

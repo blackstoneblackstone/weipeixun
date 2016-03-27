@@ -60,7 +60,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
 			return true;
 		}
 		SessionInfo sessionInfo = (SessionInfo) request.getSession().getAttribute(Constants.Config.SESSION_USER_NAME);
-		if (sessionInfo == null || sessionInfo.getId().equalsIgnoreCase("")) {// 如果没有登录或登录超时
+		if (sessionInfo == null || "".equalsIgnoreCase(sessionInfo.getId())) {// 如果没有登录或登录超时
 			request.setAttribute("msg", "您还没有登录或登录已超时，请重新登录，然后再刷新本功能！");
 			if( (RequestMethod.GET).equals(request.getMethod())){
 				request.setAttribute("handlerUrl",requestUri);

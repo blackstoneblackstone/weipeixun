@@ -10,15 +10,18 @@ import com.foxinmy.weixin4j.token.TokenStorager;
  * @className SuitePerCodeHolder
  * @author jy
  * @date 2015年6月22日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public class SuitePerCodeHolder {
 
+	private final String authCorpId;
 	private final String suiteId;
 	private final TokenStorager tokenStorager;
 
-	public SuitePerCodeHolder(String suiteId, TokenStorager tokenStorager) {
+	public SuitePerCodeHolder(String authCorpId, String suiteId,
+			TokenStorager tokenStorager) {
+		this.authCorpId = authCorpId;
 		this.suiteId = suiteId;
 		this.tokenStorager = tokenStorager;
 	}
@@ -42,7 +45,8 @@ public class SuitePerCodeHolder {
 	 * @return
 	 */
 	public String getCacheKey() {
-		return String.format("qy_suite_percode_%s", suiteId);
+		return String.format("qy_suite_percode_%s:%s", suiteId,
+				authCorpId);
 	}
 
 	/**
@@ -57,5 +61,13 @@ public class SuitePerCodeHolder {
 
 	public String getSuiteId() {
 		return this.suiteId;
+	}
+
+	public String getAuthCorpId() {
+		return this.authCorpId;
+	}
+
+	public TokenStorager getTokenStorager() {
+		return this.tokenStorager;
 	}
 }

@@ -14,8 +14,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import com.foxinmy.weixin4j.request.WeixinRequest;
 import com.foxinmy.weixin4j.socket.WeixinMessageTransfer;
 import com.foxinmy.weixin4j.type.AccountType;
-import com.foxinmy.weixin4j.util.Consts;
-import com.foxinmy.weixin4j.util.StringUtil;
+import com.foxinmy.weixin4j.util.ServerToolkits;
 
 /**
  * 微信消息
@@ -23,7 +22,7 @@ import com.foxinmy.weixin4j.util.StringUtil;
  * @className MessageTransferHandler
  * @author jy
  * @date 2015年5月17日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public class MessageTransferHandler extends DefaultHandler {
@@ -32,7 +31,7 @@ public class MessageTransferHandler extends DefaultHandler {
 	private String toUserName;
 	private String msgType;
 	private String eventType;
-	private boolean hasAgent;
+	private boolean isQY;
 	private Set<String> nodeNames;
 
 	private String content;
@@ -43,7 +42,7 @@ public class MessageTransferHandler extends DefaultHandler {
 		toUserName = null;
 		msgType = null;
 		eventType = null;
-		hasAgent = false;
+		isQY = false;
 		nodeNames = new HashSet<String>();
 	}
 
@@ -59,8 +58,10 @@ public class MessageTransferHandler extends DefaultHandler {
 			msgType = content.toLowerCase();
 		} else if (localName.equalsIgnoreCase("event")) {
 			eventType = content.toLowerCase();
-		} else if (localName.startsWith("agent")) {
-			hasAgent = true;
+		} else if (localName.startsWith("agent") // 应用信息
+				|| localName.startsWith("suite") // 套件信息
+				|| localName.equalsIgnoreCase("batchJob")) { // 批量任务
+			isQY = true;
 		}
 	}
 
@@ -71,12 +72,12 @@ public class MessageTransferHandler extends DefaultHandler {
 	}
 
 	private AccountType getAccountType() {
-		if (hasAgent) {
+		if (isQY) {
 			return AccountType.QY;
 		}
-		if (StringUtil.isBlank(msgType) && StringUtil.isBlank(eventType)) {
+		if (ServerToolkits.isBlank(msgType) && ServerToolkits.isBlank(eventType)) {
 			return null;
-		}
+		} 
 		return AccountType.MP;
 	}
 
@@ -88,7 +89,7 @@ public class MessageTransferHandler extends DefaultHandler {
 			XMLReader xmlReader = XMLReaderFactory.createXMLReader();
 			xmlReader.setContentHandler(global);
 			xmlReader.parse(new InputSource(new ByteArrayInputStream(request
-					.getOriginalContent().getBytes(Consts.UTF_8))));
+					.getOriginalContent().getBytes(ServerToolkits.UTF_8))));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (SAXException e) {

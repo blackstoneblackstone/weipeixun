@@ -48,8 +48,10 @@
                     <list>
                         <value>/user/login</value>
                         <value>/login</value>
+                        <value>/loginBak</value>
                         <value>/user/reg</value>
                         <value>/registJsp</value>
+                        <value>/qyauth</value>
                     </list>
                 </property>
             </bean>

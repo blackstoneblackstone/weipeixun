@@ -34,6 +34,10 @@ public class Result implements java.io.Serializable {
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
+	//定制化错误
+	public void setSysErrorMsg() {
+		this.msg = "系统错误，程序猿小哥走神了";
+	}
 
 	public Object getObj() {
 		return obj;

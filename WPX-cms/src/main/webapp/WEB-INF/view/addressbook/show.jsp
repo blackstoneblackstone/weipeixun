@@ -9,157 +9,217 @@
 <!--header-->
 <jsp:include page="../header.jsp"></jsp:include>
 <!--header-->
+<script src="<%=basePath%>/lib/JQuery_z_tree/js/jquery.ztree.core-3.5.min.js"></script>
+<script src="<%=basePath%>/lib/JQuery_z_tree/js/jquery.ztree.excheck-3.5.min.js"></script>
+<link rel="stylesheet" href="<%=basePath%>/lib/JQuery_z_tree/css/zTreeStyle/zTreeStyle.css">
+<link rel="stylesheet" href="<%=basePath%>/lib/bootstrap-3.3.5-dist/css/green.css"/>
+<script src="<%=basePath%>/lib/bootstrap-3.3.5-dist/js/icheck.min.js"></script>
+<div class="content">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            通讯录
+            <span>
+                <c:if test="${pTask=='1'}">
+                    <label class="label label-danger">任务状态:</label>部门同步任务开始
+                </c:if>
+                <c:if test="${pTask=='2'}">
+                    <label class="label label-danger">任务状态:</label>部门同步任务进行中
+                </c:if>
+                <c:if test="${pTask=='3'}">
+                    <label class="label label-danger">任务状态:</label> 部门同步任务已完成
+                </c:if>
+                 <c:if test="${pTask!='1'&&pTask!='2'&&pTask!='3'}">
+                     <label class="label label-danger">任务状态:</label>部门同步错误：${pTask}
+                 </c:if>
+                <c:if test="${uTask=='1'}">
+                    :成员同步任务开始
+                </c:if>
+                <c:if test="${uTask=='2'}">
+                    :成员同步任务进行中
+                </c:if>
+                <c:if test="${uTask=='3'}">
+                    :成员同步任务已完成
+                </c:if>
+                <c:if test="${uTask!='1'&&uTask!='2'&&uTask!='3'}">
+                    :成员同步错误：${uTask}
+                </c:if>
+            </span>
+            <%--<c:if test="${pTask=='3'&&uTask=='3'}">--%>
+                <button class="right btn btn-warning btn-xs" onclick="syncAddressboolToWechat()"><i
+                        class="glyphicon glyphicon-arrow-up"></i>同步到微信
+                </button>
+            <%--</c:if>--%>
 
-<!--menu-->
-<jsp:include page="../menu.jsp"></jsp:include>
-<!--menu-->
-<!--content-->
-<div id="content">
-    <!--breadcrumbs-->
-    <div id="content-header">
-        <div id="breadcrumb">
-            <a href="<%=basePath%>/platform/index" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
-            <a href="<%=basePath%>/platform/project" title="Go to project" class="tip-bottom">资源管理</a>
-            <a href="<%=basePath%>/platform/addressbook" title="Go to project" class="tip-bottom">通讯录</a>
+            <%--<button class="right btn btn-success btn-xs"><i class="glyphicon glyphicon-arrow-down"></i>同步到本地</button>--%>
         </div>
-    </div>
-    <!--End-breadcrumbs-->
-
-    <!--Action boxes-->
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span2">
-                <div class="widget-box">
-                    <div class="widget-title"><span class="icon"> <i class="icon-file"></i> </span>
-                        <h5>部门</h5>
+        <div class="panel-body">
+            <div class="col-sm-3">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        部门
+                        <button class="btn btn-xs btn-warning" href="<%=basePath%>/platform/addressbook/addDepJsp"
+                                data-toggle="modal" data-target="#Modal"><i class="glyphicon glyphicon-plus"></i>新增部门
+                        </button>
                     </div>
-                    <div class="widget-content nopadding">
-                        <ul id="department_tree"></ul>
+                    <div class="panel-body">
+                        <div id="departmentTree" class="ztree">
+
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="span8">
-                <div class="top_btn">
-                    <button class="btn btn-primary" id="synAddress"><i class="icon-plus"></i>同步通讯录</button>
-                    <button class="btn btn-success" id="addUser"><i class="icon-plus"></i>增加用户</button>
-                </div>
-                <!--End-Action boxes-->
-                <div class="widget-box">
-                    <table id="departmentMembers"></table>
+            <div class="col-sm-9">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        员工
+                        <button class="btn btn-xs btn-warning" href="<%=basePath%>/platform/addressbook/addUserJsp"
+                                data-toggle="modal" data-target="#Modal"><i class="glyphicon glyphicon-plus"></i>新增成员
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                            <thead>
+                            <th>姓名</th>
+                            <th>账号</th>
+                            <th>职位</th>
+                            <th>手机</th>
+                            <th>邮箱</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                            </thead>
+                            <tbody id="userContent" class="center">
+
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-<script type="text/javascript" src="<%=basePath%>/js/jquery.easyui.min.js"></script>
 <script>
 
     $(function () {
-        var department_tree_url = "<%=basePath%>/platform/addressbook/departmentTree";
-        var departmentid = 1;
-        var department_tree = $('#department_tree')
-                .tree(
-                {
-                    url: department_tree_url,
-                    method: 'get',
-                    lines: false,
-                    onContextMenu: function (e, node) {
-                        tree = $(this);//预先定义好，以后调用
-                        departmentid = node.id;
-                        e.preventDefault();
-                        $(this).tree('select', node.target);
-                        $('#menu').menu('show', {
-                            left: e.pageX,
-                            top: e.pageY
-                        });
-                    },
-                    onClick: function (node) {
-                        departmentid = node.id;
-                        $("#departmentMembers").datagrid('reload', {partyId: departmentid});
-                    },
-//                    onBeforeLoad : function(node, param) {
-//                        if (department_tree_url) {//只有刷新页面才会执行这个方法
-//                            parent.$.messager.progress({
-//                                title : '提示',
-//                                text : '数据处理中，请稍后....'
-//                            });
-//                        }
-//                    },
-                    onLoadSuccess: function (node, data) {
-                        parent.$.messager.progress('close');
-                    }
-                });
-        var departmentMembers_url = '<%=basePath%>/platform/addressbook/getUserByPartId';
-        $('#departmentMembers').datagrid({
-            title: '部门成员',
-            iconCls: 'icon-save',
-            method: 'get',
-            autoRowHeight: false,
-            rownumbers: 10,
-            fitColumns: true,
-            url: departmentMembers_url,
-            idField: 'userid',
-            height: 500,
-            fit: false,
-            columns: [[
-                {
-                    title: '头像', field: 'avatar', width: 80, formatter: function (value, rowData, rowIndex) {
-                    return '<img src="' + value + '" style="width:50px;"/>';
-                }
-                },
-                {title: '账号', field: 'userid', width: 80, sortable: true},
-                {title: '姓名', field: 'name', width: 80},
-                {title: '手机号', field: 'mobile', width: 80}
-            ]],
-            pagination: true,
-            toolbar: [{
-                id: 'btnadd',
-                text: 'Add',
-                iconCls: 'icon-add',
-                handler: function () {
-                    $('#btnsave').linkbutton('enable');
-                    alert('add')
-                }
-            }, {
-                id: 'btncut',
-                text: 'Cut',
-                iconCls: 'icon-cut',
-                handler: function () {
-                    $('#btnsave').linkbutton('enable');
-                    alert('cut')
-                }
-            }, '-', {
-                id: 'btnsave',
-                text: 'Save',
-                disabled: true,
-                iconCls: 'icon-save',
-                handler: function () {
-                    $('#btnsave').linkbutton('disable');
-                    alert('save')
-                }
-            }]
+        $("#menu li:eq(7)").addClass("active");
+        $('.icheck').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+            increaseArea: '20%' // optional
         });
-        var p = $('#departmentMembers').datagrid('getPager');
-        $(p).pagination({
-            onBeforeRefresh: function () {
-                alert('before refresh');
+        var setting = {
+            check: {
+                enable: false
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                beforeClick: beforeClick,
+                onClick: onClick
+            }
+        };
+
+        function beforeClick(treeId, treeNode, clickFlag) {
+            return true;
+        }
+
+        function onClick(event, treeId, treeNode, clickFlag) {
+            showUsers(treeNode.id);
+        }
+
+        showUsers(1);
+
+        function showUsers(depId) {
+            $.ajax({
+                url: "<%=basePath%>/platform/addressbook/getUserByPartId?startPage=1&partyId=" + depId,
+                type: "get",
+                success: function (data) {
+                    var table = "";
+                    if (data != null && data.length != 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            table = table + "<tr id='userid" + data[i].userid + "'>" +
+                            "<td class='left'>" + "<img src='" + data[i].avatar + "' style='width:25px;margin-right:10px;'>" + data[i].username +
+                            "</td>" +
+                            "<td>" + data[i].userid +
+                            "</td>" +
+                            "<td>" + data[i].position +
+                            "</td>" +
+                            "<td>" + data[i].mobile +
+                            "</td>" +
+                            "<td>" + data[i].email +
+                            "</td>" +
+                            "<td>" + data[i].status +
+                            "</td>" +
+                            "<td>" +
+                            "<button class='btn btn-xs btn-success' href='<%=basePath%>/platform/addressbook/editJsp?id=" + data[i].userid +
+                            "' data-toggle='modal' data-target='#Modal'>编辑</button>" +
+                            "<button class='delete btn btn-xs btn-danger' data-id='" + data[i].userid + "' data-loading-text='删除中...'>删除</button>" +
+                            "</td>" +
+                            "</tr>";
+                        }
+                        $("#userContent").html(table);
+                        $(".delete").click(function () {
+                            var userid = $(this).data("id");
+                            var deleteBtn = $(this);
+                            var $btn = deleteBtn.button('loading');
+                            $.ajax({
+                                url: "<%=basePath%>/platform/addressbook/userDelete?depId=" + depId + "&userid=" + userid,
+                                success: function (data) {
+                                    if (data.success) {
+                                        showTip(data.msg, "success");
+                                        $("#userid" + userid).remove();
+                                    } else {
+                                        showTip(data.msg, "failure");
+                                    }
+                                    $btn.button('reset');
+                                }
+                            });
+                        });
+                    } else {
+                        $("#userContent").text("空");
+                    }
+                }
+
+            });
+        }
+
+        $.ajax({
+            url: "<%=basePath%>/platform/addressbook/departmentTree",
+            type: "get",
+            success: function (data) {
+                if (data != null && data.length != 0) {
+                    $.fn.zTree.init($("#departmentTree"), setting, data);
+                } else {
+                    $("#departmentTree").text("空");
+                }
             }
         });
-        $("#synAddress").click(function () {
 
-        });
-        //增加用户
-        $("#addUser").click(function () {
-            alert('faf');
-            var url = "<%=basePath%>/platform/addressbook/addJsp?partyId=" + departmentid;
-            window.location.href = url;
-        });
+//        setCheck();
+//        $("#py").bind("change", setCheck);
+//        $("#sy").bind("change", setCheck);
+//        $("#pn").bind("change", setCheck);
+//        $("#sn").bind("change", setCheck);
     });
+
+
+    function syncAddressboolToWechat() {
+        $.ajax({
+            url: "<%=basePath%>/platform/addressbook/syncUsersToWechat",
+            type: "get",
+            success: function (data) {
+                if (data.success) {
+                    showTip(data.msg, "success");
+                } else {
+                    showTip(data.msg, "failure");
+                }
+            }
+        });
+    }
 </script>
-<link rel="stylesheet" type="text/css" href="<%=basePath%>/css/easyui.css">
-<!--content-->
 
 <!--bottom-->
 <jsp:include page="../bottom.jsp"></jsp:include>

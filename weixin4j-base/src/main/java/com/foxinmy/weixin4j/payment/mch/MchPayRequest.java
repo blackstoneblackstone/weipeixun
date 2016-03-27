@@ -1,46 +1,54 @@
 package com.foxinmy.weixin4j.payment.mch;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.foxinmy.weixin4j.exception.PayException;
+import com.foxinmy.weixin4j.model.WeixinPayAccount;
 import com.foxinmy.weixin4j.payment.PayRequest;
+import com.foxinmy.weixin4j.type.TradeType;
 
 /**
- * JS支付:get_brand_wcpay_request</br>
- * <p>
- * get_brand_wcpay_request:ok 支付成功<br>
- * get_brand_wcpay_request:cancel 支付过程中用户取消<br>
- * get_brand_wcpay_request:fail 支付失败
- * </p>
- * <p>
- * NATIVE支付:PayRequest.TradeType=NATIVE
- * </p>
+ * 支付请求接口
  * 
- * @className PayRequest
+ * @className MchPayRequest
  * @author jy
- * @date 2014年8月17日
- * @since JDK 1.7
- * @see com.foxinmy.weixin4j.payment.mch.PrePay
+ * @date 2015年12月25日
+ * @since JDK 1.6
+ * @see JSAPIPayRequest JS支付
+ * @see NATIVEPayRequest 扫码支付
+ * @see APPPayRequest APP支付
+ * @see WAPPayRequest WAP支付
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class MchPayRequest extends PayRequest {
+public interface MchPayRequest {
+	/**
+	 * 预支付交易ID
+	 * 
+	 * @return
+	 */
+	public String getPrePayId();
 
-	private static final long serialVersionUID = -5972173459255255197L;
-	
-	protected MchPayRequest() {
-		// jaxb required
-	}
-	
-	public MchPayRequest(PrePay prePay) throws PayException {
-		this.setAppId(prePay.getAppId());
-		this.setPackageInfo("prepay_id=" + prePay.getPrepayId());
-	}
+	/**
+	 * 商户信息
+	 * 
+	 * @return
+	 */
+	public WeixinPayAccount getPayAccount();
 
-	@Override
-	public String toString() {
-		return "MchPayRequest [" + super.toString() + "]";
-	}
+	/**
+	 * 交易类型
+	 * 
+	 * @return
+	 */
+	public TradeType getTradeType();
+
+	/**
+	 * 支付请求字符串
+	 * 
+	 * @return
+	 */
+	public String toRequestString();
+
+	/**
+	 * 支付请求对象
+	 * 
+	 * @return
+	 */
+	public PayRequest toRequestObject();
 }

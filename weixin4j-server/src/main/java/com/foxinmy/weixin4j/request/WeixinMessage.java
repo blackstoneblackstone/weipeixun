@@ -1,6 +1,5 @@
 package com.foxinmy.weixin4j.request;
 
-import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,7 +14,7 @@ import com.foxinmy.weixin4j.type.MessageType;
  * @className WeixinMessage
  * @author jy
  * @date 2015年5月6日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see com.foxinmy.weixin4j.message.ImageMessage
  * @see com.foxinmy.weixin4j.message.LinkMessage
  * @see com.foxinmy.weixin4j.message.LocationMessage
@@ -95,17 +94,15 @@ public class WeixinMessage implements Serializable {
 		return createTime;
 	}
 
-	@Transient
 	@XmlTransient
 	public Date getFormatCreateTime() {
-		return createTime > 0l ? new Date(createTime * 1000l) : null;
+		return new Date(createTime * 1000l);
 	}
 
 	public String getMsgType() {
 		return msgType;
 	}
 
-	@Transient
 	@XmlTransient
 	public MessageType getFormatMsgType() {
 		return MessageType.valueOf(msgType);

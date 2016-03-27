@@ -105,3 +105,74 @@
   + version upgrade to 1.5.3
   
   + 媒体接口类(MediaApi)查询素材接口调整:去掉offset,count替换为Pageable类
+  
+* 2015-09-11
+
+  + version upgrade to 1.6.0
+  
+* 2015-09-16
+
+  + version upgrade to 1.6.1
+
+* 2015-09-21
+
+  + version upgrade to 1.6.2
+  
+* 2015-11-09
+
+  + version upgrade to 1.6.3
+  
+* 2015-11-20
+
+  + 新增客服消息
+  
+ 
+* 2015-12-04
+
+  +【重要】第三方应用授权时获取永久授权码覆盖问题。
+  
+
+* 2015-12-10
+  
+  + version upgrade to 1.6.4
+  
+  + 【特大注意】weixin4j.properties全部的属性名添加`weixin4j`前缀，并用`.`代替原来的`_`
+  
+
+* 2015-12-15
+  
+  + version upgrade to 1.6.5
+  
+* 2015-12-25
+  
+  + WeixinProxy新增获取corpid(getCorpId)方法
+  
+  + WeixinProxy新增获取jsticket(getJSTicketHolder)方法
+  
+  + 私有化WeixinProxy(TokenHolder)构造器
+  
+  + SuiteApi新增获取Weixinproxy对象(getWeixinProxy)方法
+  
+  + 删除WeixinJSTicketCreator类
+  
+  + 新增企业号联系人筛选配置类(JSSDKContactConfigurator)
+      
+* 2015-12-30
+
+  + 新增服务商接口(ProviderApi)
+  
+* 2015-12-31
+
+  + version upgrade to 1.6.6
+  
+* 2016-01-23
+
+  + 新增获取客服列表接口
+
+* 2016-01-26
+
+  + 新增上传图文消息内的图片接口
+  
+* 2015-02-04
+
+  + version upgrade to 1.6.7

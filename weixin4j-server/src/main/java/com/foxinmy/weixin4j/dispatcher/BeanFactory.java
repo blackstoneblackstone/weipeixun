@@ -1,5 +1,7 @@
 package com.foxinmy.weixin4j.dispatcher;
 
+import java.util.Map;
+
 import com.foxinmy.weixin4j.exception.WeixinException;
 
 /**
@@ -8,7 +10,7 @@ import com.foxinmy.weixin4j.exception.WeixinException;
  * @className BeanFactory
  * @author jy
  * @date 2015年5月7日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public interface BeanFactory {
@@ -17,4 +19,6 @@ public interface BeanFactory {
 	<T> T getBean(Class<T> clazz) throws WeixinException;
 
 	<T> T getBean(String name, Class<T> clazz) throws WeixinException;
+
+	<T> Map<String, T> getBeans(Class<T> clazz) throws WeixinException;
 }

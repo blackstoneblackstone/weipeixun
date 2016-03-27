@@ -1,12 +1,13 @@
 package com.foxinmy.weixin4j.payment;
 
+
 /**
  * 支付URL常量类
  * 
  * @className PayURLConsts
  * @author jy
  * @date 2014年12月3日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public final class PayURLConsts {
@@ -59,10 +60,15 @@ public final class PayURLConsts {
 	public static final String MCH_PAYREPORT_URL = MCH_BASE_URL
 			+ "/payitil/report";
 	/**
-	 * 发送现金红包(商户平台)
+	 * 发送现金红包-普通红包(商户平台)
 	 */
 	public static final String MCH_REDPACKSEND_URL = MCH_BASE_URL
 			+ "/mmpaymkttransfers/sendredpack";
+	/**
+	 * 发送现金红包-裂变红包(商户平台)
+	 */
+	public static final String MCH_REDPACK_GROUPSEND_URL = MCH_BASE_URL
+			+ "/mmpaymkttransfers/sendgroupredpack";
 	/**
 	 * 查询现金红包(商户平台)
 	 */
@@ -99,15 +105,17 @@ public final class PayURLConsts {
 	public static final String MCH_SHORTURL_URL = MCH_BASE_URL
 			+ "/tools/shorturl";
 	/**
-	 * 商户平台下native支付的url-模式1
+	 * 商户平台下native支付的url(模式1)
 	 */
-	public static final String MCH_NATIVE_URL1 = "weixin://wxpay/bizpayurl?sign=%s&appid=%s&mch_id=%s&product_id=%s&time_stamp=%s&nonce_str=%s";
+	public static final String MCH_NATIVE_URL = "weixin://wxpay/bizpayurl?sign=%s&appid=%s&mch_id=%s&product_id=%s&time_stamp=%s&nonce_str=%s";
 
 	/**
-	 * 商户平台下native支付的url-模式2
+	 * WAP支付
+	 * 
+	 * @see <a
+	 *      href="https://pay.weixin.qq.com/wiki/doc/api/wap.php?chapter=15_1">WAP支付说明</a>
 	 */
-	public static final String MCH_NATIVE_URL2 = "weixin://wxpay/bizpayurl?sr=%s";
-
+	public static final String MCH_WAP_URL = "weixin://wap/pay?%s";
 	/**
 	 * 授权码查询OPENID接口
 	 */

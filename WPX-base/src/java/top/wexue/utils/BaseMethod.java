@@ -10,13 +10,44 @@ import java.util.UUID;
  */
 public class BaseMethod {
 
-    public static String createUUID(String type){
+    public static String createUUID(String type) {
         UUID uuid = UUID.randomUUID();
-        return type+uuid.toString();
+        return type + uuid.toString();
     }
-    public static long getCurrentTime(){
+
+    public static long getCurrentTime() {
         return new Date().getTime();
     }
 
+    public static boolean notEmpty(String o) {
+        if (o != null && !"".equals(o)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    public static String join(String[] ss) {
+        String s = "";
+        if (ss != null && ss.length != 0) {
+            for(String si:ss){
+                s = s + si+",";
+            }
+        } else {
+            s = "";
+        }
+        return s;
+    }
+
+    public static String[] split(String s) {
+        String[] ss = {};
+        if (notEmpty(s)) {
+            ss = s.split(",");
+        }
+        return ss;
+    }
+
+    public static String WDKCAPPID = "2";
+    public static String PXKCAPPID = "1";
+    public static String QLXZAPPID = "";
 }

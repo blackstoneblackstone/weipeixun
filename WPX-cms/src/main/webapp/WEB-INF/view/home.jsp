@@ -10,33 +10,24 @@
 <jsp:include page="header.jsp"></jsp:include>
 <!--header-->
 
-<!--menu-->
-<jsp:include page="menu.jsp"></jsp:include>
-<!--menu-->
-
 <!--content-->
 <div id="content">
     <!--breadcrumbs-->
     <div id="content-header">
-        <div id="breadcrumb"><a href="platform.jsp" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
+        <div id="breadcrumb"><a href="<%=basePath%>/platform/index" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
+            <a href="#" title="Go to 门户" class="tip-bottom"><i class="icon-asterisk"></i>学院门户</a>
         </div>
     </div>
     <!--End-breadcrumbs-->
 
     <!--Action boxes-->
     <div class="container-fluid">
-        <iframe style="float:left;background: url('/img/cms/ajax-loader.gif') center no-repeat"
-                src="http://www.wexue.top/pxkc/portalWebJsp" width="320px" height="568px">
+        <%--<iframe style="float:left;background: url('/img/cms/ajax-loader.gif') center no-repeat"--%>
+            <%--src="http://www.wexue.top/pxkc/portalWebJsp" width="320px" height="568px">--%>
 
-        </iframe>
-        <div style="float: left;margin-left: 20px">
-            <ol class="breadcrumb">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Library</a></li>
-                <li class="active">Data</li>
-            </ol>
-            <textarea style="width: 400px;height: 500px"></textarea>
-        </div>
+            <%--</iframe>--%>
+        <jsp:include page="portal/show.jsp"></jsp:include>
+
     </div>
 </div>
 

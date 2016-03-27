@@ -3,6 +3,7 @@ package com.foxinmy.weixin4j.mp.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.foxinmy.weixin4j.model.Gender;
 import com.foxinmy.weixin4j.mp.type.FaceSize;
@@ -17,7 +18,7 @@ import com.foxinmy.weixin4j.util.StringUtil;
  * 
  * @author jy.hu
  * @date 2014年4月8日
- * @since JDK 1.7
+ * @since JDK 1.6
  */
 public class User implements Serializable {
 
@@ -57,7 +58,7 @@ public class User implements Serializable {
 	/**
 	 * 用户特权信息，json 数组，如微信沃卡用户为（chinaunicom）
 	 */
-	private String privilege;
+	private JSONArray privilege;
 	/**
 	 * 用户是否订阅该公众号标识，值为0时，代表此用户没有关注该公众号，拉取不到其余信息。
 	 */
@@ -77,12 +78,21 @@ public class User implements Serializable {
 	 */
 	@JSONField(name = "unionid")
 	private String unionId;
+	/**
+	 * 公众号运营者对粉丝的备注，公众号运营者可在微信公众平台用户管理界面对粉丝添加备注
+	 */
+	private String remark;
+	/**
+	 * 用户所在的分组ID
+	 */
+	@JSONField(name = "groupid")
+	private int groupId;
 
 	public String getOpenId() {
 		return openId;
 	}
 
-	public void setOpenid(String openId) {
+	public void setOpenId(String openId) {
 		this.openId = openId;
 	}
 
@@ -154,11 +164,11 @@ public class User implements Serializable {
 		this.headimgurl = headimgurl;
 	}
 
-	public String getPrivilege() {
+	public JSONArray getPrivilege() {
 		return privilege;
 	}
 
-	public void setPrivilege(String privilege) {
+	public void setPrivilege(JSONArray privilege) {
 		this.privilege = privilege;
 	}
 
@@ -204,6 +214,22 @@ public class User implements Serializable {
 		this.unionId = unionId;
 	}
 
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public int getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();
@@ -212,7 +238,13 @@ public class User implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof User) {
-			return openId.equals(((User) obj).getOpenId());
+			User another = (User) obj;
+			if (unionId != null && another.getUnionId() != null) {
+				return unionId.equals(another.getUnionId());
+			}
+			if (openId != null && another.getOpenId() != null) {
+				return openId.equals(another.getOpenId());
+			}
 		}
 		return false;
 	}
@@ -224,6 +256,7 @@ public class User implements Serializable {
 				+ city + ", country=" + country + ", headimgurl=" + headimgurl
 				+ ", privilege=" + privilege + ", isSubscribe=" + isSubscribe
 				+ ", subscribeTime=" + subscribeTime + ", language=" + language
-				+ ", unionId=" + unionId + "]";
+				+ ", unionId=" + unionId + ", remark=" + remark + ", groupId="
+				+ groupId + "]";
 	}
 }

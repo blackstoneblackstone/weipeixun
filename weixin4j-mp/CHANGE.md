@@ -149,3 +149,63 @@
   + version upgrade to 1.5.3
   
   + 媒体接口类(MediaApi)查询素材接口调整:去掉offset,count替换为Pageable类
+  
+* 2015-09-08
+  
+  + 新增批量获取用户信息接口
+  
+* 2015-09-11
+
+  + version upgrade to 1.6.0
+
+* 2015-09-16
+
+  + version upgrade to 1.6.1
+
+* 2015-09-21
+
+  + version upgrade to 1.6.2
+  
+* 2015-11-09
+
+  + version upgrade to 1.6.3
+  
+* 2015-12-10
+  
+  + version upgrade to 1.6.4
+  
+  + 【特大注意】weixin4j.properties全部的属性名添加`weixin4j`前缀，并用`.`代替原来的`_`
+  
+* 2015-12-15
+  
+  + version upgrade to 1.6.5
+  
+* 2015-12-18
+
+  + 新增个性化菜单接口
+  
+  + WeixinProxy.getCustomRecord 参数变更为 Date startTime, Date endTime, Pageable pageable
+  
+* 2015-12-25
+  
+  + WeixinProxy新增获取appid(getAppId)方法
+  
+  + WeixinProxy新增获取jsticket(getJSTicketHolder)方法
+  
+  + 私有化WeixinProxy(TokenHolder)构造器
+  
+  + 调整WeixinTicketCreator类
+  
+* 2015-12-31
+
+  + version upgrade to 1.6.6
+  
+* 2016-01-20
+
+  + 新增获取模板和删除模板接口
+  
+  + 新增自定义个性化菜单语言信息匹配项
+  
+* 2015-02-04
+
+  + version upgrade to 1.6.7

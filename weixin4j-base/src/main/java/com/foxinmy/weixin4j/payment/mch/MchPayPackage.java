@@ -14,12 +14,12 @@ import com.foxinmy.weixin4j.type.TradeType;
 import com.foxinmy.weixin4j.util.RandomUtil;
 
 /**
- * 支付的订单详情
+ * JS支付订单详情
  * 
  * @className MchPayPackage
  * @author jy
  * @date 2014年10月21日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 @XmlRootElement
@@ -69,46 +69,53 @@ public class MchPayPackage extends PayPackage {
 	@JSONField(name = "openid")
 	private String openId;
 	/**
-	 * 只在 trade_type 为 NATIVE 时需要填写 非必须
+	 * 只在 trade_type 为 NATIVE 且【模式一】 时需要填写 非必须
 	 */
 	@XmlElement(name = "product_id")
 	@JSONField(name = "product_id")
 	private String productId;
+	/**
+	 * 指定支付方式:no_credit--指定不能使用信用卡支付
+	 */
+	@XmlElement(name = "limit_pay")
+	@JSONField(name = "limit_pay")
+	private String limitPay;
 
 	protected MchPayPackage() {
 		// jaxb required
 	}
 
 	public MchPayPackage(WeixinPayAccount weixinAccount, String openId,
-			String body, String outTradeNo, double totalFee,
-			String spbillCreateIp, TradeType tradeType) {
-		this(weixinAccount, openId, body, null, outTradeNo, totalFee, null,
-				spbillCreateIp, tradeType);
+			String body, String outTradeNo, double totalFee, String notifyUrl,
+			String createIp, TradeType tradeType) {
+		this(weixinAccount, openId, body, outTradeNo, totalFee, notifyUrl,
+				createIp, tradeType, null);
 	}
 
 	public MchPayPackage(WeixinPayAccount weixinAccount, String openId,
-			String body, String attach, String outTradeNo, double totalFee,
-			String notifyUrl, String spbillCreateIp, TradeType tradeType) {
+			String body, String outTradeNo, double totalFee, String notifyUrl,
+			String createIp, TradeType tradeType, String attach) {
 		this(weixinAccount.getId(), weixinAccount.getMchId(), weixinAccount
-				.getDeviceInfo(), RandomUtil.generateString(16), body, attach,
-				outTradeNo, totalFee, spbillCreateIp, null, null, null,
-				notifyUrl, tradeType, openId, null);
+				.getDeviceInfo(), body, outTradeNo, totalFee, notifyUrl,
+				createIp, tradeType, openId, attach, null, null, null, null,
+				null);
 	}
 
 	public MchPayPackage(String appId, String mchId, String deviceInfo,
-			String nonceStr, String body, String attach, String outTradeNo,
-			double totalFee, String spbillCreateIp, Date timeStart,
-			Date timeExpire, String goodsTag, String notifyUrl,
-			TradeType tradeType, String openId, String productId) {
-		super(body, attach, outTradeNo, totalFee, spbillCreateIp, timeStart,
-				timeExpire, goodsTag, notifyUrl);
+			String body, String outTradeNo, double totalFee, String notifyUrl,
+			String createIp, TradeType tradeType, String openId, String attach,
+			Date timeStart, Date timeExpire, String goodsTag, String productId,
+			String limitPay) {
+		super(body, outTradeNo, totalFee, notifyUrl, createIp, attach,
+				timeStart, timeExpire, goodsTag);
 		this.appId = appId;
 		this.mchId = mchId;
 		this.deviceInfo = deviceInfo;
-		this.nonceStr = nonceStr;
+		this.nonceStr = RandomUtil.generateString(16);
 		this.tradeType = tradeType.name();
 		this.openId = openId;
 		this.productId = productId;
+		this.limitPay = limitPay;
 	}
 
 	public String getAppId() {
@@ -149,6 +156,14 @@ public class MchPayPackage extends PayPackage {
 
 	public void setProductId(String productId) {
 		this.productId = productId;
+	}
+
+	public String getLimitPay() {
+		return limitPay;
+	}
+
+	public void setLimitPay(String limitPay) {
+		this.limitPay = limitPay;
 	}
 
 	@Override

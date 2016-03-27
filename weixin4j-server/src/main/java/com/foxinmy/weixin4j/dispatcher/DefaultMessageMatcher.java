@@ -19,6 +19,8 @@ import com.foxinmy.weixin4j.mp.event.KfCreateEventMessage;
 import com.foxinmy.weixin4j.mp.event.KfSwitchEventMessage;
 import com.foxinmy.weixin4j.mp.event.MassEventMessage;
 import com.foxinmy.weixin4j.mp.event.TemplatesendjobfinishMessage;
+import com.foxinmy.weixin4j.mp.event.VerifyExpireEventMessage;
+import com.foxinmy.weixin4j.mp.event.VerifyFailEventMessage;
 import com.foxinmy.weixin4j.qy.event.BatchjobresultMessage;
 import com.foxinmy.weixin4j.qy.event.EnterAgentEventMessage;
 import com.foxinmy.weixin4j.request.WeixinMessage;
@@ -32,7 +34,7 @@ import com.foxinmy.weixin4j.type.MessageType;
  * @className DefaultMessageMatcher
  * @author jy
  * @date 2015年6月10日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public class DefaultMessageMatcher implements WeixinMessageMatcher {
@@ -151,17 +153,35 @@ public class DefaultMessageMatcher implements WeixinMessageMatcher {
 		messageClassMap.put(new WeixinMessageKey(messageType,
 				EventType.kf_switch_session.name(), accountType),
 				KfSwitchEventMessage.class);
+		EventType[] eventTypes = new EventType[] {
+				EventType.qualification_verify_success,
+				EventType.naming_verify_success, EventType.annual_renew,
+				EventType.verify_expired };
+		for (EventType eventType : eventTypes) {
+			messageClassMap.put(
+					new WeixinMessageKey(messageType, eventType.name(),
+							accountType), VerifyExpireEventMessage.class);
+		}
+		eventTypes = new EventType[] { EventType.qualification_verify_success,
+				EventType.naming_verify_fail };
+		for (EventType eventType : eventTypes) {
+			messageClassMap.put(
+					new WeixinMessageKey(messageType, eventType.name(),
+							accountType), VerifyFailEventMessage.class);
+		}
 	}
 
 	private void initQyEventMessageClass() {
 		String messageType = MessageType.event.name();
-		// batch_job_result消息不好区分微信号类型
 		messageClassMap.put(new WeixinMessageKey(messageType,
-				EventType.batch_job_result.name(), AccountType.MP),
+				EventType.batch_job_result.name(), AccountType.QY),
 				BatchjobresultMessage.class);
 		messageClassMap.put(new WeixinMessageKey(messageType,
 				EventType.enter_agent.name(), AccountType.QY),
 				EnterAgentEventMessage.class);
+		//messageClassMap.put(new WeixinMessageKey(messageType,
+			//	EventType.suite.name(), AccountType.QY),
+				//SuiteMessage.class);
 	}
 
 	@Override
@@ -172,7 +192,7 @@ public class DefaultMessageMatcher implements WeixinMessageMatcher {
 	@Override
 	public void regist(WeixinMessageKey messageKey,
 			Class<? extends WeixinMessage> messageClass) {
-		Class<?> clazz = messageClassMap.get(messageKey);
+		Class<?> clazz = match(messageKey);
 		if (clazz != null) {
 			throw new IllegalArgumentException("duplicate messagekey '"
 					+ messageKey + "' define for " + clazz);

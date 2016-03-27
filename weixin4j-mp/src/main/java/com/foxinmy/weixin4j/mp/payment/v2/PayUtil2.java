@@ -64,7 +64,7 @@ public class PayUtil2 {
 	public static String createPayJsRequestJsonV2(String body, String orderNo,
 			double orderFee, String notify_url, String ip,
 			WeixinPayAccount weixinAccount) {
-		PayPackageV2 payPackage = new PayPackageV2(body, orderNo, orderFee,
+		PayPackageV2 payPackage = new PayPackageV2(body, orderNo,null, orderFee,
 				notify_url, ip);
 		payPackage.setPartner(weixinAccount.getPartnerId());
 		return createPayJsRequestJsonV2(payPackage, weixinAccount);

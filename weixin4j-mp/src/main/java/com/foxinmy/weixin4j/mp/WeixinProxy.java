@@ -1,7 +1,6 @@
 package com.foxinmy.weixin4j.mp;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +14,7 @@ import com.foxinmy.weixin4j.model.MediaItem;
 import com.foxinmy.weixin4j.model.MediaRecord;
 import com.foxinmy.weixin4j.model.MediaUploadResult;
 import com.foxinmy.weixin4j.model.Pageable;
+import com.foxinmy.weixin4j.model.WeixinAccount;
 import com.foxinmy.weixin4j.mp.api.CustomApi;
 import com.foxinmy.weixin4j.mp.api.DataApi;
 import com.foxinmy.weixin4j.mp.api.GroupApi;
@@ -22,7 +22,6 @@ import com.foxinmy.weixin4j.mp.api.HelperApi;
 import com.foxinmy.weixin4j.mp.api.MassApi;
 import com.foxinmy.weixin4j.mp.api.MediaApi;
 import com.foxinmy.weixin4j.mp.api.MenuApi;
-import com.foxinmy.weixin4j.mp.api.MpApi;
 import com.foxinmy.weixin4j.mp.api.NotifyApi;
 import com.foxinmy.weixin4j.mp.api.QrApi;
 import com.foxinmy.weixin4j.mp.api.TmplApi;
@@ -35,23 +34,27 @@ import com.foxinmy.weixin4j.mp.model.Following;
 import com.foxinmy.weixin4j.mp.model.Group;
 import com.foxinmy.weixin4j.mp.model.KfAccount;
 import com.foxinmy.weixin4j.mp.model.KfSession;
+import com.foxinmy.weixin4j.mp.model.Menu;
 import com.foxinmy.weixin4j.mp.model.MenuSetting;
 import com.foxinmy.weixin4j.mp.model.QRParameter;
 import com.foxinmy.weixin4j.mp.model.QRResult;
 import com.foxinmy.weixin4j.mp.model.SemQuery;
 import com.foxinmy.weixin4j.mp.model.SemResult;
+import com.foxinmy.weixin4j.mp.model.TemplateMessageInfo;
 import com.foxinmy.weixin4j.mp.model.User;
+import com.foxinmy.weixin4j.mp.token.WeixinTicketCreator;
 import com.foxinmy.weixin4j.mp.token.WeixinTokenCreator;
 import com.foxinmy.weixin4j.mp.type.DatacubeType;
 import com.foxinmy.weixin4j.mp.type.IndustryType;
 import com.foxinmy.weixin4j.mp.type.Lang;
 import com.foxinmy.weixin4j.token.TokenHolder;
-import com.foxinmy.weixin4j.token.TokenStorager;
 import com.foxinmy.weixin4j.tuple.MassTuple;
 import com.foxinmy.weixin4j.tuple.MpArticle;
 import com.foxinmy.weixin4j.tuple.MpVideo;
 import com.foxinmy.weixin4j.tuple.Tuple;
 import com.foxinmy.weixin4j.type.MediaType;
+import com.foxinmy.weixin4j.type.TicketType;
+import com.foxinmy.weixin4j.util.Weixin4jSettings;
 
 /**
  * 微信公众平台接口实现
@@ -59,7 +62,7 @@ import com.foxinmy.weixin4j.type.MediaType;
  * @className WeixinProxy
  * @author jy.hu
  * @date 2014年3月23日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see <a href="http://mp.weixin.qq.com/wiki/index.php">api文档</a>
  */
 public class WeixinProxy {
@@ -77,40 +80,35 @@ public class WeixinProxy {
 	private final DataApi dataApi;
 
 	private final TokenHolder tokenHolder;
+	private Weixin4jSettings settings;
 
 	/**
 	 * 默认使用文件方式保存token、使用weixin4j.properties配置的账号信息
 	 */
 	public WeixinProxy() {
-		this(MpApi.DEFAULT_TOKEN_STORAGER);
-	}
-
-	/**
-	 * 默认使用weixin4j.properties配置的账号信息
-	 * 
-	 * @param tokenStorager
-	 */
-	public WeixinProxy(TokenStorager tokenStorager) {
-		this(MpApi.DEFAULT_WEIXIN_ACCOUNT.getId(), MpApi.DEFAULT_WEIXIN_ACCOUNT
-				.getSecret(), tokenStorager);
+		this(new Weixin4jSettings());
 	}
 
 	/**
 	 * 
-	 * @param appid
-	 * @param appsecret
+	 * @param settings
+	 *            微信配置信息
+	 * @see com.foxinmy.weixin4j.util.Weixin4jSettings
 	 */
-	public WeixinProxy(String appid, String appsecret) {
-		this(appid, appsecret, MpApi.DEFAULT_TOKEN_STORAGER);
+	public WeixinProxy(Weixin4jSettings settings) {
+		this(new TokenHolder(new WeixinTokenCreator(settings.getWeixinAccount()
+				.getId(), settings.getWeixinAccount().getSecret()),
+				settings.getTokenStorager0()));
+		this.settings = settings;
 	}
 
-	public WeixinProxy(String appid, String appsecret,
-			TokenStorager tokenStorager) {
-		this(new TokenHolder(new WeixinTokenCreator(appid, appsecret),
-				tokenStorager));
-	}
-
-	public WeixinProxy(TokenHolder tokenHolder) {
+	/**
+	 * 注意：TokenCreator 需为 <font color="red">WeixinTokenCreator</font>
+	 * 
+	 * @see com.foxinmy.weixin4j.mp.token.WeixinTokenCreator
+	 * @param tokenHolder
+	 */
+	private WeixinProxy(TokenHolder tokenHolder) {
 		this.tokenHolder = tokenHolder;
 		this.mediaApi = new MediaApi(tokenHolder);
 		this.notifyApi = new NotifyApi(tokenHolder);
@@ -125,8 +123,35 @@ public class WeixinProxy {
 		this.dataApi = new DataApi(tokenHolder);
 	}
 
+	/**
+	 * 获取微信账号信息
+	 * 
+	 * @return
+	 */
+	public WeixinAccount getWeixinAccount() {
+		return this.settings.getWeixinAccount();
+	}
+
+	/**
+	 * token获取
+	 * 
+	 * @return
+	 */
 	public TokenHolder getTokenHolder() {
 		return this.tokenHolder;
+	}
+
+	/**
+	 * 获取JSSDK Ticket的tokenHolder
+	 * 
+	 * @param ticketType
+	 *            票据类型
+	 * @return
+	 */
+	public TokenHolder getTicketHolder(TicketType ticketType) {
+		return new TokenHolder(new WeixinTicketCreator(getWeixinAccount()
+				.getId(), ticketType, this.tokenHolder),
+				this.settings.getTokenStorager0());
 	}
 
 	/**
@@ -195,30 +220,6 @@ public class WeixinProxy {
 	public MediaUploadResult uploadMedia(boolean isMaterial, InputStream is,
 			String fileName) throws WeixinException {
 		return mediaApi.uploadMedia(isMaterial, is, fileName);
-	}
-
-	/**
-	 * 下载媒体文件
-	 * <p>
-	 * 正常情况下返回表头如Content-Type: image/jpeg,否则抛出异常.
-	 * </p>
-	 * 
-	 * @param mediaId
-	 *            存储在微信服务器上的媒体标识
-	 * @param mediaType
-	 *            媒体类型
-	 * @param isMaterial
-	 *            是否永久素材
-	 * @return 写入硬盘后的文件对象
-	 * @throws WeixinException
-	 * @see <a
-	 *      href="http://mp.weixin.qq.com/wiki/10/78b15308b053286e2a66b33f0f0f5fb6.html">上传下载说明</a>
-	 * @see com.foxinmy.weixin4j.mp.api.MediaApi
-	 * @see {@link #downloadMedia(String)}
-	 */
-	public File downloadMediaFile(String mediaId, boolean isMaterial)
-			throws WeixinException {
-		return mediaApi.downloadMediaFile(mediaId, isMaterial);
 	}
 
 	/**
@@ -319,6 +320,8 @@ public class WeixinProxy {
 	 * 
 	 * @param is
 	 *            大小不超过1M且格式为MP4的视频文件
+	 * @param fileName
+	 *            文件名 为空时将自动生成
 	 * @param title
 	 *            视频标题
 	 * @param introduction
@@ -329,9 +332,9 @@ public class WeixinProxy {
 	 * @see com.foxinmy.weixin4j.mp.api.MediaApi
 	 * @throws WeixinException
 	 */
-	public String uploadMaterialVideo(InputStream is, String title,
-			String introduction) throws WeixinException {
-		return mediaApi.uploadMaterialVideo(is, title, introduction);
+	public String uploadMaterialVideo(InputStream is, String fileName,
+			String title, String introduction) throws WeixinException {
+		return mediaApi.uploadMaterialVideo(is, fileName, title, introduction);
 	}
 
 	/**
@@ -360,7 +363,6 @@ public class WeixinProxy {
 	 * @see com.foxinmy.weixin4j.mp.api.MediaApi
 	 * @see com.foxinmy.weixin4j.mp.model.MediaRecord
 	 * @see com.foxinmy.weixin4j.type.MediaType
-	 * @see com.foxinmy.weixin4j.mp.model.MediaItem
 	 * @see com.foxinmy.weixin4j.model.MediaItem
 	 * @see com.foxinmy.weixin4j.model.Pageable
 	 * @see com.foxinmy.weixin4j.model.Pagedata
@@ -427,16 +429,12 @@ public class WeixinProxy {
 	/**
 	 * 客服聊天记录
 	 * 
-	 * @param openId
-	 *            用户标识 为空时则查询全部记录
-	 * @param starttime
+	 * @param startTime
 	 *            查询开始时间
-	 * @param endtime
+	 * @param endTime
 	 *            查询结束时间 每次查询不能跨日查询
-	 * @param pagesize
-	 *            每页大小 每页最多拉取50条
-	 * @param pageindex
-	 *            查询第几页 从1开始
+	 * @param pageable
+	 *            分页数据
 	 * @see com.foxinmy.weixin4j.mp.model.CustomRecord
 	 * @see com.foxinmy.weixin4j.mp.api.CustomApi
 	 * @see <a href="http://dkf.qq.com/document-1_1.html">查询客服聊天记录</a>
@@ -444,10 +442,9 @@ public class WeixinProxy {
 	 *      href="http://mp.weixin.qq.com/wiki/19/7c129ec71ddfa60923ea9334557e8b23.html">查询客服聊天记录</a>
 	 * @throws WeixinException
 	 */
-	public List<CustomRecord> getCustomRecord(String openId, Date starttime,
-			Date endtime, int pagesize, int pageindex) throws WeixinException {
-		return customApi.getCustomRecord(openId, starttime, endtime, pagesize,
-				pageindex);
+	public List<CustomRecord> getCustomRecord(Date startTime, Date endTime,
+			Pageable pageable) throws WeixinException {
+		return customApi.getCustomRecord(startTime, endTime, pageable);
 	}
 
 	/**
@@ -521,22 +518,23 @@ public class WeixinProxy {
 	/**
 	 * 上传客服头像
 	 * 
-	 * @param id
+	 * @param accountId
 	 *            完整客服账号，格式为：账号前缀@公众号微信号
-	 * @param headimg
+	 * @param is
 	 *            头像图片文件必须是jpg格式，推荐使用640*640大小的图片以达到最佳效果
+	 * @param fileName
+	 *            文件名 为空时将自动生成
 	 * @return 处理结果
-	 * @throws WeixinException
-	 * @throws IOException
 	 * @see com.foxinmy.weixin4j.mp.api.CustomApi
+	 * @throws WeixinException
 	 * @see <a
 	 *      href="http://mp.weixin.qq.com/wiki/9/6fff6f191ef92c126b043ada035cc935.html#.E5.AE.A2.E6.9C.8D.E7.AE.A1.E7.90.86.E6.8E.A5.E5.8F.A3.E8.BF.94.E5.9B.9E.E7.A0.81.E8.AF.B4.E6.98.8E">客服管理接口返回码</a>
 	 * @see <a
 	 *      href="http://mp.weixin.qq.com/wiki/9/6fff6f191ef92c126b043ada035cc935.html#.E4.B8.8A.E4.BC.A0.E5.AE.A2.E6.9C.8D.E5.A4.B4.E5.83.8F">上传客服头像</a>
 	 */
-	public JsonResult uploadAccountHeadimg(String id, File headimg)
-			throws WeixinException, IOException {
-		return customApi.uploadAccountHeadimg(id, headimg);
+	public JsonResult uploadAccountHeadimg(String accountId, InputStream is,
+			String fileName) throws WeixinException {
+		return customApi.uploadAccountHeadimg(accountId, is, fileName);
 	}
 
 	/**
@@ -816,7 +814,6 @@ public class WeixinProxy {
 	 * @return 消息发送状态
 	 * @throws WeixinException
 	 * @see com.foxinmy.weixin4j.mp.api.MassApi
-	 * @see {@link com.foxinmy.weixin4j.util.MessageUtil#getStatusDesc(String)}
 	 * @see <a
 	 *      href="http://mp.weixin.qq.com/wiki/15/5380a4e6f02f2ffdc7981a8ed7a40753.html#.E6.9F.A5.E8.AF.A2.E7.BE.A4.E5.8F.91.E6.B6.88.E6.81.AF.E5.8F.91.E9.80.81.E7.8A.B6.E6.80.81.E3.80.90.E8.AE.A2.E9.98.85.E5.8F.B7.E4.B8.8E.E6.9C.8D.E5.8A.A1.E5.8F.B7.E8.AE.A4.E8.AF.81.E5.90.8E.E5.9D.87.E5.8F.AF.E7.94.A8.E3.80.91">查询群发状态</a>
 	 */
@@ -862,6 +859,43 @@ public class WeixinProxy {
 	 */
 	public User getUser(String openId, Lang lang) throws WeixinException {
 		return userApi.getUser(openId, lang);
+	}
+
+	/**
+	 * 批量获取用户信息
+	 * 
+	 * @param openIds
+	 *            用户ID
+	 * @return 用户列表
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/14/bb5031008f1494a59c6f71fa0f319c66.html">获取用户信息</a>
+	 * @see com.foxinmy.weixin4j.mp.model.User
+	 * @see com.foxinmy.weixin4j.mp.api.UserApi
+	 * @throws WeixinException
+	 * @see {@link #getUsers(Lang,String[])}
+	 */
+	public List<User> getUsers(String... openIds) throws WeixinException {
+		return userApi.getUsers(openIds);
+	}
+
+	/**
+	 * 批量获取用户信息
+	 * 
+	 * @param lang
+	 *            国家地区语言版本
+	 * @param openIds
+	 *            用户ID
+	 * @return 用户列表
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/14/bb5031008f1494a59c6f71fa0f319c66.html">获取用户信息</a>
+	 * @see com.foxinmy.weixin4j.mp.type.Lang
+	 * @see com.foxinmy.weixin4j.mp.model.User
+	 * @see com.foxinmy.weixin4j.mp.api.UserApi
+	 * @throws WeixinException
+	 */
+	public List<User> getUsers(Lang lang, String... openIds)
+			throws WeixinException {
+		return userApi.getUsers(lang, openIds);
 	}
 
 	/**
@@ -1035,7 +1069,7 @@ public class WeixinProxy {
 	/**
 	 * 自定义菜单
 	 * 
-	 * @param btnList
+	 * @param buttons
 	 *            菜单列表
 	 * @throws WeixinException
 	 * @see <a
@@ -1044,8 +1078,8 @@ public class WeixinProxy {
 	 * @see com.foxinmy.weixin4j.type.ButtonType
 	 * @see com.foxinmy.weixin4j.mp.api.MenuApi
 	 */
-	public JsonResult createMenu(List<Button> btnList) throws WeixinException {
-		return menuApi.createMenu(btnList);
+	public JsonResult createMenu(List<Button> buttons) throws WeixinException {
+		return menuApi.createMenu(buttons);
 	}
 
 	/**
@@ -1063,16 +1097,61 @@ public class WeixinProxy {
 	}
 
 	/**
+	 * 查询全部菜单(包含个性化菜单)
+	 * 
+	 * @return 菜单集合
+	 * @throws WeixinException
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/16/ff9b7b85220e1396ffa16794a9d95adc.html">查询菜单</a>
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/0/c48ccd12b69ae023159b4bfaa7c39c20.html">个性化菜单</a>
+	 * @see com.foxinmy.weixin4j.model.Button
+	 * @see com.foxinmy.weixin4j.mp.model.Menu
+	 * @see com.foxinmy.weixin4j.mp.api.MenuApi
+	 */
+	public List<Menu> getAllMenu() throws WeixinException {
+		return menuApi.getAllMenu();
+	}
+
+	/**
 	 * 删除菜单
 	 * 
 	 * @throws WeixinException
 	 * @see <a
 	 *      href="http://mp.weixin.qq.com/wiki/16/8ed41ba931e4845844ad6d1eeb8060c8.html">删除菜单</a>
-	 * @see com.foxinmy.weixin4j.model.Button
 	 * @see com.foxinmy.weixin4j.mp.api.MenuApi
 	 */
 	public JsonResult deleteMenu() throws WeixinException {
 		return menuApi.deleteMenu();
+	}
+
+	/**
+	 * 删除个性化菜单
+	 * 
+	 * @throws WeixinException
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/0/c48ccd12b69ae023159b4bfaa7c39c20.html#.E5.88.A0.E9.99.A4.E4.B8.AA.E6.80.A7.E5.8C.96.E8.8F.9C.E5.8D.95">删除个性化菜单</a>
+	 * @see com.foxinmy.weixin4j.mp.api.MenuApi
+	 * @return 处理结果
+	 */
+	public JsonResult deleteCustomMenu(String menuId) throws WeixinException {
+		return menuApi.deleteCustomMenu(menuId);
+	}
+
+	/**
+	 * 测试个性化菜单匹配结果
+	 * 
+	 * @param userId
+	 *            可以是粉丝的OpenID，也可以是粉丝的微信号。
+	 * @return 匹配到的菜单配置
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/0/c48ccd12b69ae023159b4bfaa7c39c20.html#.E6.B5.8B.E8.AF.95.E4.B8.AA.E6.80.A7.E5.8C.96.E8.8F.9C.E5.8D.95.E5.8C.B9.E9.85.8D.E7.BB.93.E6.9E.9C">测试个性化菜单</a>
+	 * @see com.foxinmy.weixin4j.model.Button
+	 * @see com.foxinmy.weixin4j.mp.api.MenuApi
+	 * @throws WeixinException
+	 */
+	public List<Button> matchCustomMenu(String userId) throws WeixinException {
+		return menuApi.matchCustomMenu(userId);
 	}
 
 	/**
@@ -1093,20 +1172,9 @@ public class WeixinProxy {
 	}
 
 	/**
-	 * 生成带参数的二维码
-	 * 
-	 * @return 硬盘存储的文件对象
-	 * @throws WeixinException
-	 * @see {@link #createQR(QRParameter)}
-	 */
-	public File createQRFile(QRParameter parameter) throws WeixinException {
-		return qrApi.createQRFile(parameter);
-	}
-
-	/**
 	 * 设置所属行业(每月可修改行业1次，账号仅可使用所属行业中相关的模板)
 	 * 
-	 * @param industryType
+	 * @param industryTypes
 	 *            所处行业 目前不超过两个
 	 * @return 操作结果
 	 * @throws WeixinException
@@ -1115,9 +1183,9 @@ public class WeixinProxy {
 	 * @see <a
 	 *      href="http://mp.weixin.qq.com/wiki/17/304c1885ea66dbedf7dc170d84999a9d.html#.E8.AE.BE.E7.BD.AE.E6.89.80.E5.B1.9E.E8.A1.8C.E4.B8.9A">设置所处行业</a>
 	 */
-	public JsonResult setTmplIndustry(IndustryType... industryType)
+	public JsonResult setTmplIndustry(IndustryType... industryTypes)
 			throws WeixinException {
-		return tmplApi.setTmplIndustry(industryType);
+		return tmplApi.setTmplIndustry(industryTypes);
 	}
 
 	/**
@@ -1133,6 +1201,35 @@ public class WeixinProxy {
 	 */
 	public String getTemplateId(String shortId) throws WeixinException {
 		return tmplApi.getTemplateId(shortId);
+	}
+
+	/**
+	 * 获取模板列表
+	 * 
+	 * @return 模板列表
+	 * @see com.foxinmy.weixin4j.mp.model.TemplateMessageInfo
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/5/6dde9eaa909f83354e0094dc3ad99e05.html#.E8.8E.B7.E5.8F.96.E6.A8.A1.E6.9D.BF.E5.88.97.E8.A1.A8">获取模板列表</a>
+	 * @see com.foxinmy.weixin4j.mp.api.TmplApi
+	 * @throws WeixinException
+	 */
+	public List<TemplateMessageInfo> getAllTemplates() throws WeixinException {
+		return tmplApi.getAllTemplates();
+	}
+
+	/**
+	 * 删除模板
+	 * 
+	 * @param templateId
+	 *            公众帐号下模板消息ID
+	 * @return 处理结果
+	 * @see <a
+	 *      href="http://mp.weixin.qq.com/wiki/5/6dde9eaa909f83354e0094dc3ad99e05.html#.E5.88.A0.E9.99.A4.E6.A8.A1.E6.9D.BF">删除模板</a>
+	 * @see com.foxinmy.weixin4j.mp.api.TmplApi
+	 * @throws WeixinException
+	 */
+	public JsonResult deleteTemplate(String templateId) throws WeixinException {
+		return tmplApi.deleteTemplate(templateId);
 	}
 
 	/**
@@ -1315,5 +1412,5 @@ public class WeixinProxy {
 		return dataApi.datacube(datacubeType, date);
 	}
 
-	public final static String VERSION = "1.5.2";
+	public final static String VERSION = "1.6.7";
 }

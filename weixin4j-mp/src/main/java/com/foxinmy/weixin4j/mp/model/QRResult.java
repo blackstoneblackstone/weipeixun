@@ -1,7 +1,6 @@
 package com.foxinmy.weixin4j.mp.model;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -11,7 +10,7 @@ import com.alibaba.fastjson.annotation.JSONField;
  * @className QRResult
  * @author jy
  * @date 2015年7月29日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public class QRResult implements Serializable {
@@ -59,7 +58,6 @@ public class QRResult implements Serializable {
 	@Override
 	public String toString() {
 		return "QRResult [ticket=" + ticket + ", url=" + url
-				+ ", expireSeconds=" + expireSeconds + ", content="
-				+ Arrays.toString(content) + "]";
+				+ ", expireSeconds=" + expireSeconds + ", content=...]";
 	}
 }

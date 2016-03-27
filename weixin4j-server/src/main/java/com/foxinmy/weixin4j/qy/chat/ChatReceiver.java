@@ -1,6 +1,5 @@
 package com.foxinmy.weixin4j.qy.chat;
 
-import java.beans.Transient;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -12,7 +11,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @className ChatReceiver
  * @author jy
  * @date 2015年8月1日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public class ChatReceiver implements Serializable {
@@ -24,7 +23,7 @@ public class ChatReceiver implements Serializable {
 	@XmlElement(name = "id")
 	private String targetId;
 	/**
-	 * 群聊|单聊
+	 * 群聊|单聊|userid|openid
 	 */
 	@XmlElement(name = "type")
 	private String chatType;
@@ -37,7 +36,6 @@ public class ChatReceiver implements Serializable {
 		return chatType;
 	}
 
-	@Transient
 	@XmlTransient
 	public ChatType getFormatChatType() {
 		return ChatType.valueOf(chatType);

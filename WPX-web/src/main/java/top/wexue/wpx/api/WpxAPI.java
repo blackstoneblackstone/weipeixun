@@ -17,7 +17,7 @@ import com.foxinmy.weixin4j.token.TokenHolder;
 import com.foxinmy.weixin4j.type.ButtonType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import top.wexue.wpx.dao.AuthCorpInfoDAO;
+import top.wexue.dao.AuthCorpInfoDAO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,13 +73,13 @@ public class WpxAPI {
         return oUserInfo;
     }
 
-    public String getPerCode() throws WeixinException {
-        SuitePerCodeHolder suitePerCodeHolder = suiteApi.getPerCodeHolder();
+    public String getPerCode(String authCorpId) throws WeixinException {
+        SuitePerCodeHolder suitePerCodeHolder = suiteApi.getPerCodeHolder(authCorpId);
         return suitePerCodeHolder.getPermanentCode();
     }
 
     public String createMenu(String authCorid, OUserInfo oUserInfo) throws WeixinException {
-        TokenHolder tokenHolder = suiteApi.createTokenHolder(authCorid);
+        TokenHolder tokenHolder = suiteApi.getTokenSuiteHolder(authCorid);
         MenuApi menuApi = new MenuApi(tokenHolder);
         String msg = "agentItems:>>";
         for (OUserInfo.AgentItem agentItem : oUserInfo.getAuthInfo().getAgentItems()) {
@@ -155,7 +155,7 @@ public class WpxAPI {
     }
 
     public User getCurrentUser(String code, String corpid) {
-        TokenHolder tokenHolder = suiteApi.createTokenHolder(corpid);
+        TokenHolder tokenHolder = suiteApi.getTokenSuiteHolder(corpid);
         UserApi userApi = new UserApi(tokenHolder);
         try {
             return userApi.getUserByCode(code);
@@ -166,7 +166,7 @@ public class WpxAPI {
     }
 
     public User getUserById(String userId, String corpid) throws WeixinException {
-        TokenHolder tokenHolder = suiteApi.createTokenHolder(corpid);
+        TokenHolder tokenHolder = suiteApi.getTokenSuiteHolder(corpid);
         UserApi userApi = new UserApi(tokenHolder);
         return userApi.getUser(userId);
     }

@@ -65,3 +65,54 @@
 * 2015-08-01
 
   + 整理了Tuple消息元件并新增ChatTuple企业号聊天消息元件
+  
+* 2015-09-27
+
+ + 新增手动刷新token方法
+ 
+ 
+* 2015-11-23
+
+  + PayException重命名为WeixinPayException
+  
+  + 调整PayPackageV2构造函数：从主到次
+  
+  + 调整PayUtil2#createPayJsRequestJsonV2参数位置：从主到次
+  
+  + 调整MicroPayPackage构造函数：从主到次
+  
+  + 调整MicroPayPackage构造函数：从主到次
+  
+  + 调整PayUtil#createPayJsRequestJson参数位置：从主到次
+  
+  + 调整PayUtil#createNativePayRequestURL参数位置：从主到次
+  
+* 2015-12-04
+
+  +【重要】修改PayUtil中的createPayJsRequest方法的返回值为MchPayRequest，便于二次发起支付。
+  
+  +【重要】添加MchPayRequest的构造函数，便于二次发起支付。
+  
+* 2015-12-19
+
+  + 删除PayUtil类,接口转移到PayApi类
+  
+* 2015-12-25
+  
+  + WeixinPayProxy类新增获取支付信息#getWeixinAccount方法
+  
+  + 新增JSSDK的config生成类
+  
+  + JSSDKHelper 重命名为 JSSDKConfigurator
+  
+  + 重构了token类
+  
+* 2015-12-26
+  
+  + MchPayRequest抽象化
+  
+* 2016-01-24
+
+  + 新增MemoryTokenStorager(内存保存token)类
+  
+  + TokenStorager类新增evict和clear接口

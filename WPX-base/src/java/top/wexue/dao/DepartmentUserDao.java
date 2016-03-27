@@ -24,16 +24,16 @@ public class DepartmentUserDao {
         return result;
     }
 
-    public int save(String departmentid, String userId) {
-        String sql = "insert into " + TABLE + " (departmentid,authuserid) values (?,?)";
-        int result = this.jdbcTemplate.update(sql, departmentid, userId);
+    public int save(String departmentid, String userId,String corpid) {
+        String sql = "insert into " + TABLE + " (departmentid,authuserid,corpid) values (?,?,?)";
+        int result = this.jdbcTemplate.update(sql, departmentid, userId,corpid);
         return result;
     }
 
-    public int delete(String projectid) {
+    public int delete(String departmentid, String authuserid,String corpid) {
         try {
-            String sql = "DELETE from project_leader where projectid=?";
-            int result = this.jdbcTemplate.update(sql, projectid);
+            String sql = "DELETE from " + TABLE + " where departmentid=? AND authuserid=? AND corpid=?";
+            int result = this.jdbcTemplate.update(sql, departmentid, authuserid,corpid);
             return result;
         } catch (EmptyResultDataAccessException e) {
             return 0;

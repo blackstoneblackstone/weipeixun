@@ -338,6 +338,14 @@
 		<text>导入文件存在不合法的内容</text>
 	</error>
 	<error>
+		<code>40093</code>
+		<text>不合法的跳转target</text>
+	</error>
+	<error>
+		<code>40094</code>
+		<text>不合法的URL</text>
+	</error>
+	<error>
 		<code>40117</code>
 		<text>分组名字不合法</text>
 	</error>
@@ -464,6 +472,14 @@
 		<text>缺少永久授权码</text>
 	</error>
 	<error>
+		<code>41034</code>
+		<text>缺少login_ticket</text>
+	</error>
+	<error>
+		<code>41035</code>
+		<text>缺少跳转target</text>
+	</error>
+	<error>
 		<code>42001</code>
 		<desc>access_token expired</desc>
 		<text>access_token超时</text>
@@ -481,6 +497,10 @@
 	<error>
 		<code>42004</code>
 		<text>插件token超时</text>
+	</error>
+	<error>
+		<code>42007</code>
+		<text>用户修改微信密码，accesstoken和refreshtoken失效，需要重新授权</text>
 	</error>
 	<error>
 		<code>43001</code>
@@ -637,6 +657,14 @@
 		<code>45018</code>
 		<desc>too many group now, no need to add new</desc>
 		<text>组数量过多</text>
+	</error>
+	<error>
+		<code>45022</code>
+		<text>应用名字长度不合法，合法长度为2-16个字</text>
+	</error>
+	<error>
+		<code>45047</code>
+		<text>客服接口下行条数超过上限</text>
 	</error>
 	<error>
 		<code>45024</code>
@@ -816,6 +844,30 @@
 	<error>
 		<code>60017</code>
 		<text>不允许设置企业</text>
+	</error>
+	<error>
+		<code>60019</code>
+		<text>不允许设置应用地理位置上报开关</text>
+	</error>
+	<error>
+		<code>60020</code>
+		<text>访问ip不在白名单之中</text>
+	</error>
+	<error>
+		<code>60025</code>
+		<text>主页型应用不支持的消息类型</text>
+	</error>
+	<error>
+		<code>60027</code>
+		<text>不支持第三方修改主页型应用字段</text>
+	</error>
+	<error>
+		<code>60028</code>
+		<text>应用已授权予第三方，不允许通过接口修改主页url</text>
+	</error>
+	<error>
+		<code>60029</code>
+		<text>应用已授权予第三方，不允许通过接口修改可信域名</text>
 	</error>
 	<error>
 		<code>60102</code>
@@ -1057,6 +1109,86 @@
 	<error>
 		<code>86222</code>
 		<text>不允许消息服务访问的API</text>
+	</error>
+	<error>
+		<code>86304</code>
+		<text>不合法的消息类型</text>
+	</error>
+	<error>
+		<code>86305</code>
+		<text>客服服务未启用</text>
+	</error>
+	<error>
+		<code>86306</code>
+		<text>缺少发送人</text>
+	</error>
+	<error>
+		<code>86307</code>
+		<text>缺少发送人类型</text>
+	</error>
+	<error>
+		<code>86308</code>
+		<text>缺少发送人id</text>
+	</error>
+	<error>
+		<code>86309</code>
+		<text>缺少接收人</text>
+	</error>
+	<error>
+		<code>86310</code>
+		<text>缺少接收人类型</text>
+	</error>
+	<error>
+		<code>86311</code>
+		<text>缺少接收人id</text>
+	</error>
+	<error>
+		<code>86312</code>
+		<text>缺少消息类型</text>
+	</error>
+	<error>
+		<code>86313</code>
+		<text>缺少客服，发送人或接收人类型，必须有一个为kf</text>
+	</error>
+	<error>
+		<code>86314</code>
+		<text>客服不唯一，发送人或接收人类型，必须只有一个为kf</text>
+	</error>
+	<error>
+		<code>86315</code>
+		<text>不合法的发送人类型</text>
+	</error>
+	<error>
+		<code>86316</code>
+		<text>不合法的发送人id。Userid不存在、openid不存在、kf不存在</text>
+	</error>
+	<error>
+		<code>86317</code>
+		<text>不合法的接收人类型</text>
+	</error>
+	<error>
+		<code>86318</code>
+		<text>不合法的接收人id。Userid不存在、openid不存在、kf不存在</text>
+	</error>
+	<error>
+		<code>86319</code>
+		<text>不合法的客服，kf不在客服列表中</text>
+	</error>
+	<error>
+		<code>90001</code>
+		<text>未开通摇一摇周边</text>
+	</error>
+	<error>
+		<code>90002</code>
+		<text>缺少ticket参数</text>
+	</error>
+	<error>
+		<code>90003</code>
+		<text>ticket参数不合法</text>
+	</error>
+	<error>
+		<code>90004</code>
+		<text>ticket过期</text>
 	</error>
 	<!-- 语义理解API错误 -->
 	<error>

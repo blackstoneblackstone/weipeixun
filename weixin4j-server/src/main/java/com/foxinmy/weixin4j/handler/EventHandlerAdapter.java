@@ -22,11 +22,10 @@ import java.util.Set;
 public abstract class EventHandlerAdapter<M extends EventMessage> implements
         WeixinMessageHandler {
 
-    @Override
     public boolean canHandle(WeixinRequest request, Object message,
                              Set<String> nodeNames) throws WeixinException {
         return message != null
-                && message.getClass() == ClassUtil.getGenericType(this)
+                && message.getClass() == ClassUtil.getGenericType(this.getClass())
                 && canHandle0(request, (M) message);
     }
 
@@ -45,7 +44,6 @@ public abstract class EventHandlerAdapter<M extends EventMessage> implements
         return true;
     }
 
-    @Override
     public WeixinResponse doHandle(WeixinRequest request, Object message,
                                    Set<String> nodeNames) throws WeixinException {
         return doHandle0(request, (M) message);

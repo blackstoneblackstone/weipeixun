@@ -28,7 +28,11 @@ public class Constants {
         public static String LOGIN_USER = "LU";
         public static String COURSE = "COURSE";
         public static String PROJECT = "PRO";
-
+        public static String AUTHINFO = "AI";
+        public static String AUTHDEPARTMENT = "AD";
+        public static String PORTAL = "PORTAL";
+        public static String FILE = "FILE";
+        public static String AVATOR = "AVATOR";
     }
 
 }

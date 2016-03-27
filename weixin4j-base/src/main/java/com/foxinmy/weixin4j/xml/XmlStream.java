@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -39,17 +38,27 @@ import com.foxinmy.weixin4j.util.StringUtil;
  * @className XmlStream
  * @author jy
  * @date 2015年6月2日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public final class XmlStream {
 	private final static String ROOT_ELEMENT_XML = "xml";
 	private final static String XML_VERSION = "1.0";
-	private final static Map<Class<?>, Unmarshaller> messageUnmarshaller;
-	private final static Map<Class<?>, Marshaller> messageMarshaller;
+	private final static ThreadLocal<Map<Class<?>, Unmarshaller>> messageUnmarshaller;
+	private final static ThreadLocal<Map<Class<?>, Marshaller>> messageMarshaller;
 	static {
-		messageUnmarshaller = new HashMap<Class<?>, Unmarshaller>();
-		messageMarshaller = new HashMap<Class<?>, Marshaller>();
+		messageUnmarshaller = new ThreadLocal<Map<Class<?>, Unmarshaller>>() {
+			@Override
+			protected Map<Class<?>, Unmarshaller> initialValue() {
+				return new HashMap<Class<?>, Unmarshaller>();
+			}
+		};
+		messageMarshaller = new ThreadLocal<Map<Class<?>, Marshaller>>() {
+			@Override
+			protected Map<Class<?>, Marshaller> initialValue() {
+				return new HashMap<Class<?>, Marshaller>();
+			}
+		};
 	}
 
 	/**
@@ -63,12 +72,12 @@ public final class XmlStream {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T fromXML(InputStream content, Class<T> clazz) {
-		Unmarshaller unmarshaller = messageUnmarshaller.get(clazz);
+		Unmarshaller unmarshaller = messageUnmarshaller.get().get(clazz);
 		if (unmarshaller == null) {
 			try {
 				JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
 				unmarshaller = jaxbContext.createUnmarshaller();
-				messageUnmarshaller.put(clazz, unmarshaller);
+				messageUnmarshaller.get().put(clazz, unmarshaller);
 			} catch (JAXBException e) {
 				throw new IllegalArgumentException(e);
 			}
@@ -77,9 +86,10 @@ public final class XmlStream {
 			Source source = new StreamSource(content);
 			XmlRootElement rootElement = clazz
 					.getAnnotation(XmlRootElement.class);
-			if (rootElement == null || rootElement.name().equals(
-					XmlRootElement.class.getMethod("name")
-					.getDefaultValue().toString())) {
+			if (rootElement == null
+					|| rootElement.name().equals(
+							XmlRootElement.class.getMethod("name")
+									.getDefaultValue().toString())) {
 				JAXBElement<T> jaxbElement = unmarshaller.unmarshal(source,
 						clazz);
 				return jaxbElement.getValue();
@@ -130,6 +140,9 @@ public final class XmlStream {
 			for (Iterator<Entry<String, String>> it = map.entrySet().iterator(); it
 					.hasNext();) {
 				Entry<String, String> entry = it.next();
+				if (StringUtil.isBlank(entry.getValue())) {
+					continue;
+				}
 				xw.writeStartElement(entry.getKey());
 				xw.writeCData(entry.getValue());
 				xw.writeEndElement();
@@ -149,6 +162,13 @@ public final class XmlStream {
 		return sw.getBuffer().toString();
 	}
 
+	/**
+	 * map2xml
+	 * 
+	 * @param json
+	 *            value无嵌套的json
+	 * @return xml内容
+	 */
 	public static String map2xml(JSONObject json) {
 		StringWriter sw = new StringWriter();
 		try {
@@ -156,10 +176,14 @@ public final class XmlStream {
 					.createXMLStreamWriter(sw);
 			xw.writeStartDocument(Consts.UTF_8.name(), XML_VERSION);
 			xw.writeStartElement(ROOT_ELEMENT_XML);
-			Set<String> keys = json.keySet();
-			for (String key : keys) {
-				xw.writeStartElement(key);
-				xw.writeCData(json.getString(key));
+			for (Iterator<Entry<String, Object>> it = json.entrySet()
+					.iterator(); it.hasNext();) {
+				Entry<String, Object> entry = it.next();
+				if (StringUtil.isBlank(json.getString(entry.getKey()))) {
+					continue;
+				}
+				xw.writeStartElement(entry.getKey());
+				xw.writeCData(json.getString(entry.getKey()));
 				xw.writeEndElement();
 			}
 			xw.writeEndDocument();
@@ -242,13 +266,14 @@ public final class XmlStream {
 	@SuppressWarnings("unchecked")
 	public static <T> void toXML(T t, OutputStream os) {
 		Class<T> clazz = (Class<T>) t.getClass();
-		Marshaller marshaller = messageMarshaller.get(clazz);
+		Marshaller marshaller = messageMarshaller.get().get(clazz);
 		if (marshaller == null) {
 			try {
 				JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
 				marshaller = jaxbContext.createMarshaller();
-				marshaller.setProperty(Marshaller.JAXB_ENCODING, Consts.UTF_8.name()); 
-				messageMarshaller.put(clazz, marshaller);
+				marshaller.setProperty(Marshaller.JAXB_ENCODING,
+						Consts.UTF_8.name());
+				messageMarshaller.get().put(clazz, marshaller);
 			} catch (JAXBException e) {
 				throw new IllegalArgumentException(e);
 			}

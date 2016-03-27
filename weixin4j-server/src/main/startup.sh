@@ -1,15 +1,15 @@
 ulimit -n 110000
 #JDK home
-JAVA_HOME="/opt/jdk1.7.0_75/"
+JAVA_HOME="/usr/local/java/"
  
 #executing user
 RUNNING_USER=root
  
 #Run home
-APP_HOME="/opt/weipeixun/server"
+APP_HOME="/usr/local/weixin/weixin4j-server"
  
 #main class
-APP_MAINCLASS=com/foxinmy/weixin4j/startup/WeixinServerBootstrap.class
+APP_MAINCLASS=WeixinServerBootstrap.class
  
 #classpath
 CLASSPATH=$APP_HOME/classes
@@ -20,7 +20,7 @@ done
 CLASSPATH="$CLASSPATH":"$APP_HOME"/conf
  
 #jvm options
-JAVA_OPTS="-Xms256m -Xmx2048m -Djava.awt.headless=true -XX:MaxPermSize=512m -server -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=85 -XX:+DisableExplicitGC -Xnoclassgc -Xverify:none"
+JAVA_OPTS="-Xms256m -Xmx1024m -Djava.awt.headless=true -XX:MaxPermSize=128m -server -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=85 -XX:+DisableExplicitGC -Xnoclassgc -Xverify:none"
  
 #psid
 psid=0

@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.foxinmy.weixin4j.type.SignType;
@@ -16,7 +17,7 @@ import com.foxinmy.weixin4j.type.SignType;
  * @className PayBaseInfo
  * @author jy
  * @date 2014年11月5日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 @XmlRootElement
@@ -28,31 +29,31 @@ public class PayBaseInfo implements Serializable {
 	/**
 	 * 公众号ID
 	 */
-	@JSONField(name = "AppId")
+	@JSONField(name = "appId")
 	@XmlElement(name = "AppId")
 	private String appId;
 	/**
 	 * 时间戳
 	 */
-	@JSONField(name = "TimeStamp")
+	@JSONField(name = "timeStamp")
 	@XmlElement(name = "TimeStamp")
 	private String timeStamp;
 	/**
 	 * 随机字符串
 	 */
-	@JSONField(name = "NonceStr")
+	@JSONField(name = "nonceStr")
 	@XmlElement(name = "NonceStr")
 	private String nonceStr;
 	/**
 	 * 签名结果
 	 */
-	@JSONField(name = "AppSignature")
+	@JSONField(name = "paySign")
 	@XmlElement(name = "AppSignature")
 	private String paySign;
 	/**
 	 * 签名方式
 	 */
-	@JSONField(name = "SignMethod")
+	@JSONField(name = "signType")
 	@XmlElement(name = "SignMethod")
 	private String signType;
 
@@ -92,6 +93,7 @@ public class PayBaseInfo implements Serializable {
 		return signType;
 	}
 
+	@XmlTransient
 	@JSONField(serialize = false)
 	public SignType getFormatSignType() {
 		return signType != null ? SignType.valueOf(signType.toUpperCase())

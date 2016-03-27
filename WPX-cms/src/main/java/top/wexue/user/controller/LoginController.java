@@ -1,5 +1,7 @@
 package top.wexue.user.controller;
 
+import com.foxinmy.weixin4j.exception.WeixinException;
+import com.foxinmy.weixin4j.qy.model.OUserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,19 +10,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.wexue.common.model.Result;
 import top.wexue.common.service.WeixinAPI;
+import top.wexue.dao.AuthCorpInfoDAO;
 import top.wexue.utils.BaseMethod;
 import top.wexue.utils.Constants;
 import top.wexue.user.utils.IpUtil;
 import top.wexue.utils.MD5Util;
-import top.wexue.dao.AuthCorpInfoDao;
 import top.wexue.dao.LoginUserDao;
 import top.wexue.model.SessionInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -36,7 +40,7 @@ public class LoginController {
     @Autowired
     private LoginUserDao loginUserDao;
     @Autowired
-    private AuthCorpInfoDao authCorpInfoDao;
+    private AuthCorpInfoDAO authCorpInfoDao;
     @Autowired
     private WeixinAPI weixinAPI;
 
@@ -49,6 +53,36 @@ public class LoginController {
     public String loginJSP(HttpServletRequest request, String handlerUrl) {
         request.setAttribute("handlerUrl", handlerUrl);
         return "login";
+    }
+
+    @RequestMapping(value = "/loginBak", method = RequestMethod.GET)
+    public String loginBakJsp() {
+        return "loginBak";
+    }
+
+    /*
+    *企业号授权登陆
+    *http://www.wexue.top/qyAuth?auth_code=ce075635d1b3e3249c7f2869468e859d&state=&expires_in=600
+    */
+    @RequestMapping(value = "/qyauth", method = RequestMethod.GET)
+    public String qyauth(String auth_code, HttpServletRequest request, HttpSession session, String state, String expires_in) {
+        try {
+            OUserInfo oUserInfo = weixinAPI.getOUserInfoByCode(auth_code);
+            SessionInfo sessionInfo = new SessionInfo();
+            sessionInfo.setIp(IpUtil.getIpAddr(request));
+            sessionInfo.setUsername(oUserInfo.getAdminInfo().getName());
+            sessionInfo.setId(String.valueOf(new Date().getTime()));
+            sessionInfo.setUserId(oUserInfo.getAdminInfo().getUserId());
+            sessionInfo.setCorpid(oUserInfo.getCorpInfo().getCorpId());
+            sessionInfo.setQyname(oUserInfo.getCorpInfo().getCorpName());
+            sessionInfo.setQyheader(oUserInfo.getCorpInfo().getRoundLogoUrl());
+            session.setAttribute(Constants.Config.SESSION_USER_NAME, sessionInfo);
+            //初始化
+            weixinAPI.initWeixinAPI(oUserInfo.getCorpInfo().getCorpId());
+        } catch (WeixinException e) {
+            e.printStackTrace();
+        }
+        return "platform";
     }
 
     /**
@@ -71,6 +105,7 @@ public class LoginController {
                     sessionInfo.setIp(IpUtil.getIpAddr(request));
                     sessionInfo.setUsername(username);
                     sessionInfo.setId(user.get("id").toString());
+                    sessionInfo.setUserId(user.get("userid").toString());
                     sessionInfo.setCorpid(user.get("corpid").toString());
                     sessionInfo.setQyname(corp.get("corp_name").toString());
                     sessionInfo.setQyheader(corp.get("corp_square_logo_url").toString());
@@ -95,9 +130,25 @@ public class LoginController {
         return result;
     }
 
+    /**
+     * 用户退出
+     *
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
+    public void logout(HttpSession session, HttpServletResponse response) {
+        session.removeAttribute(Constants.Config.SESSION_USER_NAME);
+        try {
+            response.sendRedirect("/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @RequestMapping(value = "/registJsp", method = RequestMethod.GET)
-    public String registJsp(HttpServletRequest request, @RequestParam(value="userheader",required=true)String userheader,  @RequestParam(value="corpid",required=true)String corpid) {
+    public String registJsp(HttpServletRequest request, @RequestParam(value = "userheader", required = true) String userheader, @RequestParam(value = "corpid", required = true) String corpid) {
         try {
 
             request.setAttribute("userheader", URLDecoder.decode(userheader, "utf-8"));

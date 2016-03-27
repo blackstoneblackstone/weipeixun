@@ -1,6 +1,11 @@
 package top.wexue.user.controller;
 
+import com.foxinmy.weixin4j.qy.model.ChatInfo;
+import org.springframework.web.bind.annotation.ResponseBody;
+import top.wexue.common.model.Result;
 import top.wexue.common.service.WeixinAPI;
+import top.wexue.dao.GroupDao;
+import top.wexue.dao.GroupUserDao;
 import top.wexue.model.Page;
 import top.wexue.utils.BaseMethod;
 import top.wexue.utils.Constants;
@@ -34,13 +39,26 @@ public class ProjectController {
     @Autowired
     ProjectLeaderDao projectLeaderDao;
     @Autowired
+    private GroupDao groupDao;
+    @Autowired
     WeixinAPI weixinAPI;
+    @Autowired
+    private GroupUserDao groupUserDao;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String project(HttpServletRequest request, HttpSession session,Page page) {
         SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
         List<Map<String, Object>> projects = projectDao.getProjectListByCorpid(sessionInfo.getCorpid(),page);
         request.setAttribute("projects", projects);
+        List<User> users = new ArrayList<User>(0);
+        try {
+            users = weixinAPI.listUser(1, false, UserStatus.BOTH, true);
+        } catch (WeixinException e) {
+            e.printStackTrace();
+        }
+        request.setAttribute("users", users);
+        request.setAttribute("prepage",page.getStartPage()-1);
+        request.setAttribute("nextpage",page.getStartPage()+1);
         return "/project/show";
     }
 
@@ -73,6 +91,12 @@ public class ProjectController {
         }
     }
 
+    @RequestMapping(value = "/createStudyGroupJsp", method = RequestMethod.GET)
+    public String createStudyGroupJsp(String projectid, HttpServletRequest request) {
+        request.setAttribute("projectid", projectid);
+        return "project/createStudyGroup";
+    }
+
     @RequestMapping(value = "/addJsp", method = RequestMethod.GET)
     public String addJsp(HttpSession session, HttpServletRequest request) {
         List<User> users = new ArrayList<User>(0);
@@ -81,11 +105,9 @@ public class ProjectController {
         } catch (WeixinException e) {
             e.printStackTrace();
         }
-        System.out.println(users.get(0).getName());
         request.setAttribute("users", users);
         return "project/add";
     }
-
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public void add(HttpSession session, HttpServletRequest request, HttpServletResponse response, String name, String desc, String starttime, String endtime, String[] fuzeren) {
         String proId = BaseMethod.createUUID(Constants.EntityType.PROJECT);
@@ -105,18 +127,40 @@ public class ProjectController {
         }
     }
 
+    @RequestMapping(value = "/createStudyGroup", method = RequestMethod.POST)
+    @ResponseBody
+    public Result add(String gname, String gdesc,String projectid, String[] gusers, HttpSession session) {
+        Result result = new Result();
+        if (!(gusers != null && gusers.length > 3)) {
+            result.setSuccess(false);
+            result.setMsg("人数太少，至少三个人才能聊吧");
+            return result;
+        }
+        try {
+            SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+            ChatInfo chatInfo = new ChatInfo(gname, sessionInfo.getUserId(), gusers);
+            String chatS = weixinAPI.createChat(chatInfo);
+            weixinAPI.sendGroupTextChatMessage(chatS,sessionInfo.getUserId(),gdesc);
+            result.setSuccess(true);
+            result.setMsg("学习小组创建成功");
+            //保存小组
+            for (String guser : gusers) {
+                groupUserDao.save(guser, chatS);
+            }
+            groupDao.save(chatS, gname, gdesc, projectid, null, sessionInfo.getCorpid());
+        } catch (WeixinException e) {
+            result.setSuccess(false);
+            result.setMsg(e.getLocalizedMessage());
+        }
+        return result;
+    }
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public void delete(String id, HttpServletRequest request, HttpServletResponse response) {
-
+    @ResponseBody
+    public Result delete(String id, HttpServletRequest request, HttpServletResponse response) {
         projectDao.delete(id);
         projectLeaderDao.delete(id);
-
-        try {
-            String path = request.getContextPath();
-            String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
-            response.sendRedirect(basePath + "/platform/project");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Result result=new Result();
+        result.setSuccess(true);
+        return  result;
     }
 }

@@ -10,166 +10,126 @@
 <jsp:include page="../header.jsp"></jsp:include>
 
 <!--header-->
-
-<!--menu-->
-<jsp:include page="../menu.jsp"></jsp:include>
-<!--menu-->
-<style>
-
-    .well {
-        padding-top: 0px;
-        padding-left: 15px;
-    }
-    .courseLogo{
-        width: 100px;
-    }
-
-    [class*="span"] {
-        margin-left: 10px;
-    }
-</style>
 <!--content-->
-<div id="content">
-    <!--breadcrumbs-->
-    <div id="content-header">
-        <div id="breadcrumb">
-            <a href="<%=basePath%>/platform/index" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
-            <a href="<%=basePath%>/platform/project" title="Go to project" class="tip-bottom">Course</a>
-        </div>
-    </div>
-    <!--End-breadcrumbs-->
-
+<div class="content">
     <!--Action boxes-->
-    <div class="container-fluid">
-        <div class="quick-actions_homepage">
-            <button type="button" class="btn btn-default"
-                    onclick="javascript:window.location.href='<%=basePath%>/platform/course/addJsp?type=1'"><i
-                    class="icon-plus"></i> 新增公开课
-            </button>
-            <button type="button" class="btn btn-default"
-                    onclick="javascript:window.location.href='<%=basePath%>/platform/course/addJsp?type=2'"><i
-                    class="icon-plus"></i> 新增必修课
-            </button>
-            <hr>
-        </div>
+    <button type="button" class="btn btn-default" href="<%=basePath%>/platform/course/addJsp?type=1"
+            data-toggle="modal" data-target="#Modal">
+        <i class="glyphicon glyphicon-plus"></i> 新增公开课
+    </button>
+    <button type="button" class="btn btn-primary" href="<%=basePath%>/platform/course/addJsp?type=2"
+            data-toggle="modal" data-target="#Modal">
+        <i class="glyphicon glyphicon-plus"></i> 新增必修课
+    </button>
+    <hr>
+    <div class="widget-box">
+        <table class="table table-bordered data-table">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>背景图</th>
+                <th>名称</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>参加人数</th>
+                <th>类型</th>
+                <th>教学元素</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:forEach items="${courses}" var="course" varStatus="s">
+                <tr>
+                    <td>#${ s.index + 1}</td>
+                    <td><img src="${course.icon}" class="cou-bg"></td>
+                    <td>
+                        <div class="tool" data-toggle="tooltip" data-placement="right"
+                             data-title="${course.coursedesc}">${course.coursename}</div>
+                    </td>
+                    <td>${course.starttime}</td>
+                    <td>${course.endtime}</td>
+                    <td>${course.factperson}</td>
+                    <td>
+                        <c:if test="${course.coursetype==1}">
+                            <span class="label label-success">公开课</span>
+                        </c:if>
+                        <c:if test="${course.coursetype==2}">
+                            <span class="label label-danger">必修课</span>
+                        </c:if>
+                    </td>
 
-        <!--End-Action boxes-->
-        <div>
-            <span class="label label-important">项目：</span>
-            <select id="selectProject">
-                <c:forEach items="${projects}" var="pro">
-                    <option value="${pro.id}">${pro.proname}</option>
-                </c:forEach>
-            </select>
-
-
-            <!-- Tab panes -->
-            <div class="widget-box">
-                <div class="widget-title"><span class="icon"> <i class="icon-align-justify"></i> </span>
-                    <h5>所属课程</h5>
-                </div>
-                <div class="widget-content nopadding">
-                    <div class="todo">
-                        <ul id="courses">
-                            <li class="clearfix">
-                                <div class="span1.5">
-                                    <img class="courseLogo span1" src="<%=basePath%>/img/cms/course_default_logo.png"/>
+                    <td>
+                        <button class="btn btn-xs btn-info tool" title="点击发送图文,查看已发送图文" data-placement="top"
+                                href="<%=basePath%>/platform/course/sendResearchJsp?id=${course.id}"
+                                data-toggle="modal" data-target="#Modal">调研测试
+                        </button>
+                        <button class="btn btn-xs btn-warning tool"
+                                title="新建学习小组" data-placement="top"
+                                href="<%=basePath%>/platform/course/createStudyGroupJsp?id=${course.id}"
+                                data-toggle="modal" data-target="#Modal">学习小组
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn btn-xs btn-primary"
+                                href="<%=basePath%>/platform/course/editJsp?id=${course.id}"
+                                data-toggle="modal" data-target="#Modal${course.id}">编辑
+                        </button>
+                        <div class="modal fade" id="Modal${course.id}" tabindex="-1" role="dialog"
+                             aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="loading"><img src="<%=basePath%>/img/loading.gif"></div>
                                 </div>
-                                <div class="span7"><h4>Luanch This theme on Themeforest <span
-                                        class="date badge badge-success">公开课</span></h4>
+                            </div>
+                        </div>
+                        <button data-id="${course.id}" data-loading-text="删除中..." class="delete btn btn-xs btn-danger">
+                            删除
+                        </button>
+                    </td>
+                </tr>
+            </c:forEach>
+            </tbody>
+        </table>
+        <c:if test="${empty courses}">
+            <div class="no-content">无内容</div>
+        </c:if>
+    </div>
 
-                                    <div class="row-fluid">
-                                        <dl class="span3">
-                                            <dt>主讲人：</dt>
-                                            <dt>负责人：</dt>
-                                            <dt>参与人数：</dt>
-                                        </dl>
-                                        <dl class="span3">
-                                            <dt>课程时间：</dt>
-                                            <dt>上课地点：</dt>
-                                        </dl>
-                                    </div>
-                                    <div class="row-fluid">
-                                        课程简介：
-                                    </div>
-                                </div>
-                                <div class="span2">
-                                    <button class="btn btn-success">编辑</button>
-                                    <button class="btn btn-danger">删除</button>
-                                </div>
-                            </li>
-
-                        </ul>
-                    </div>
-                </div>
-            </div>
+    <div class="page">
+        <div class="right">
+            <c:if test="${prepage>0}">
+                <button onclick="javascript:window.location.href='<%=basePath%>/platform/course?startPage=${prepage}&projectid=${projectid}'"
+                        id="btn-pre" class="btn btn-mini">上一页
+                </button>
+            </c:if>
+            <c:if test="${!empty courses}">
+                <button onclick="javascript:window.location.href='<%=basePath%>/platform/course?startPage=${nextpage}&projectid=${projectid}'"
+                        id="btn-next" class="btn btn-mini btn-inverse">下一页
+                </button>
+            </c:if>
         </div>
     </div>
+
+    <div class="clear"></div>
 </div>
+</div>
+<!--content-->
 <script>
     $(function () {
-        $("#selectProject").change(function () {
-            var proid = $("#selectProject").val();
-            showCourse(proid);
-        });
-        var id = $("#selectProject").val();
-        showCourse(id);
-    });
-
-
-    function showCourse(proid) {
-        var course = "";
-        $.ajax({
-            url: "<%=basePath%>/platform/course/courseByproId?proid=" + proid,
-            type: "get",
-            success: function (data) {
-                if (data.success) {
-                    var objs = data.obj;
-                    for (var i = 0; i < data.obj.length; i++) {
-
-                        course = course + '  <li class="clearfix"><div class="span1.5">'
-                        + ' <img class="span1 courseLogo" src="' + objs[i].icon + '"/>'
-                        + ' </div>'
-                        + '<div class="span7"><h4>' + objs[i].coursename + '<span'
-                        + 'class="date badge badge-success">公开课</span></h4>'
-                        + '<div class="row-fluid">'
-                        + '<dl class="span5">'
-                        + '<dt>主讲人：';
-                        for (var a = 0; a < objs[i].zhujiangren.length; a++) {
-                            course = course + objs[i].zhujiangren[a] + ";";
-                        }
-                        course = course + '</dt><dt>负责人：';
-                        for (var b = 0; b < objs[i].fuzeren.length; b++) {
-                            course = course + objs[i].fuzeren[b] + ";";
-                        }
-                        course = course + '</dt><dt>参与人数：';
-                        for (var c = 0; b < objs[i].canyuren.length; c++) {
-                            course = course + objs[i].canyuren[c] + ";";
-                        }
-                        course = course + '</dt>'
-                        + '<dt>参与人数：' + objs[i].canyuren + '</dt>'
-                        + '</dl>'
-                        + '<dl class="span5">'
-                        + '<dt>课程时间：' + objs[i].starttime + '-' + objs[i].endtime + '</dt>'
-                        + '<dt>上课地点：' + objs[i].place + '</dt>'
-                        + ' </dl>'
-                        + '</div> <div class="row-fluid">课程简介：' + objs[i].coursedesc
-                        + '</div></div>'
-                        + '<div class="span2">'
-                        + '<button class="btn btn-success">编辑</button>'
-                        + '<button class="btn btn-danger">删除</button>'
-                        + '</div></li>';
-                    }
-                    $("#courses").html(course);
+        $("#menu li:eq(2)").addClass("active");
+        $(".delete").click(function () {
+            var deleteBtn = $(this);
+            var $btn = deleteBtn.button('loading');
+            $.ajax({
+                url: "<%=basePath%>/platform/course/delete?id=" + $(this).data("id"),
+                success: function (data) {
+                    location.reload();
                 }
-            }
+            });
 
         });
-
-    }
-
+    });
 </script>
-<!--content-->
 
 <!--bottom-->
 <jsp:include page="../bottom.jsp"></jsp:include>

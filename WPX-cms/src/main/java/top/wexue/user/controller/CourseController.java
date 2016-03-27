@@ -1,8 +1,14 @@
 package top.wexue.user.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.foxinmy.weixin4j.exception.WeixinException;
+import com.foxinmy.weixin4j.qy.message.ChatMessage;
+import com.foxinmy.weixin4j.qy.message.NotifyMessage;
+import com.foxinmy.weixin4j.qy.model.ChatInfo;
+import com.foxinmy.weixin4j.qy.model.IdParameter;
 import com.foxinmy.weixin4j.qy.model.User;
 import com.foxinmy.weixin4j.qy.type.UserStatus;
+import com.foxinmy.weixin4j.tuple.News;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.wexue.common.model.Result;
 import top.wexue.common.service.WeixinAPI;
+import top.wexue.dao.*;
 import top.wexue.model.Page;
 import top.wexue.user.utils.WebUtils;
 import top.wexue.utils.BaseMethod;
 import top.wexue.utils.Constants;
-import top.wexue.dao.CourseDao;
-import top.wexue.dao.CourseUserDao;
-import top.wexue.dao.ProjectDao;
 import top.wexue.model.Course;
 import top.wexue.model.SessionInfo;
 
@@ -35,27 +39,36 @@ import java.util.Map;
 @RequestMapping("/platform/course")
 public class CourseController {
     @Autowired
-    ProjectDao projectDao;
+    private ProjectDao projectDao;
     @Autowired
-    CourseDao courseDao;
+    private CourseDao courseDao;
     @Autowired
-    CourseUserDao courseUserDao;
+    private GroupDao groupDao;
     @Autowired
-    WeixinAPI weixinAPI;
+    private GroupUserDao groupUserDao;
+    @Autowired
+    private CourseUserDao courseUserDao;
+    @Autowired
+    private ResearchDao researchDao;
+    @Autowired
+    private ResearchCourseDao researchCourseDao;
+    @Autowired
+    private AuthInfoDAO authInfoDAO;
+    @Autowired
+    private WeixinAPI weixinAPI;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public String course(HttpServletRequest request, HttpSession session,Page page) {
+    public String course(HttpServletRequest request, String projectid, HttpSession session, Page page) {
         SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
-        List<Map<String, Object>> projects = projectDao.getProjectListByCorpid(sessionInfo.getCorpid(),page);
-        request.setAttribute("projects", projects);
+        if (BaseMethod.notEmpty(projectid)) {
+            request.setAttribute("courses", courseDao.getCoursesByProId(projectid, sessionInfo.getCorpid(), page));
+            request.setAttribute("projectid", projectid);
+        } else {
+            request.setAttribute("courses", courseDao.getCourses(sessionInfo.getCorpid(), page));
+        }
+        request.setAttribute("prepage", page.getStartPage() - 1);
+        request.setAttribute("nextpage", page.getStartPage() + 1);
         return "/course/show";
-    }
-
-    @RequestMapping(value = "/courseByProId", method = RequestMethod.GET)
-    @ResponseBody
-    public List<Map<String, Object>> courseByProId(String proId,String corpid) {
-        List<Map<String, Object>> courses = courseDao.getCoursesByProId(proId,corpid);
-        return courses;
     }
 
     @RequestMapping(value = "/editJsp", method = RequestMethod.GET)
@@ -64,6 +77,106 @@ public class CourseController {
         request.setAttribute("course", course);
         return "/course/edit";
     }
+
+    @RequestMapping(value = "/sendResearchJsp", method = RequestMethod.GET)
+    public String sendResearchJsp(String id, HttpServletRequest request, HttpSession session, Page page) {
+        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+        List<Map<String, Object>> researchs = researchDao.getResearchs(sessionInfo.getCorpid(), page);
+        request.setAttribute("researchs", researchs);
+        request.setAttribute("courseid", id);
+        return "/course/sendResearch";
+    }
+
+    @RequestMapping(value = "/sendResearch", method = RequestMethod.GET)
+    @ResponseBody
+    public Result sendResearch(String courseid, String researchid, HttpSession session) {
+        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+        Map<String, Object> research = researchDao.getResearchById(researchid);
+        List<Map<String, Object>> courseUsers = courseUserDao.getUserListByCourseId(courseid);
+        News news = new News();
+        Map<String, Object> agent = authInfoDAO.getAuthInfoByAppId(sessionInfo.getCorpid(), BaseMethod.WDKCAPPID);
+        IdParameter idParameter = new IdParameter();
+        List<String> userIds = new ArrayList<String>();
+        for (Map<String, Object> courseUser : courseUsers) {
+            userIds.add(courseUser.get("userid").toString());
+        }
+        idParameter.setUserIds(userIds);
+        NotifyMessage notify = new NotifyMessage(Integer.valueOf(agent.get("agentid").toString()), news, idParameter, false);
+        news.addArticle(research.get("rname").toString(), research.get("rdesc").toString(), "http://www.wexue.top:20000/images/survey-default.jpg", "http://www.wexue.top/research/survey?corpid=" + sessionInfo.getCorpid() + "&id=" + researchid);
+        //news.addArticle("title2", "desc2", "picUrl2", "url2");
+        Result result = new Result();
+        if (userIds == null || userIds.isEmpty()) {
+            result.setSuccess(false);
+            result.setMsg("发送失败，该课程还没有人订阅呢");
+        } else {
+            IdParameter jo = null;
+            try {
+                jo = weixinAPI.sendNotifyMessage(notify);
+            } catch (WeixinException e1) {
+                result.setSuccess(false);
+                result.setSysErrorMsg();
+            }
+
+            //记录使用情况
+            researchCourseDao.add(courseid, researchid);
+            //标记已使用
+            researchDao.isUsed(researchid);
+            result.setSuccess(true);
+            result.setMsg("发送成功，" + jo.toString());
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/createStudyGroupJsp", method = RequestMethod.GET)
+    public String createStudyGroupJsp(String id, HttpServletRequest request, HttpSession session, Page page) {
+        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+        List<Map<String, Object>> users = courseDao.getUsersByCourseid(sessionInfo.getCorpid(), id);
+        Map<String, Object> course = courseDao.getCourseById(id);
+        request.setAttribute("courseid", id);
+        request.setAttribute("users", users);
+        request.setAttribute("coursename", course.get("coursename").toString());
+        return "/course/createStudyGroup";
+    }
+
+    @RequestMapping(value = "/createBigStudyGroup", method = RequestMethod.GET)
+    @ResponseBody
+    public Result createStudyGroupJsp(String courseid, HttpServletRequest request, HttpSession session) {
+        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+        Result result = new Result();
+        return result;
+    }
+
+    @RequestMapping(value = "/createSmallStudyGroup", method = RequestMethod.POST)
+    @ResponseBody
+    public Result createStudyGroupJsp(String courseid, String gname, String gdesc, String[] gusers, HttpSession session) {
+        Result result = new Result();
+        if (!(gusers != null && gusers.length > 3)) {
+            result.setSuccess(false);
+            result.setMsg("人数太少，至少三个人才能聊吧");
+            return result;
+        }
+        try {
+            SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+            ChatInfo chatInfo = new ChatInfo(gname, sessionInfo.getUserId(), gusers);
+            String chatS = weixinAPI.createChat(chatInfo);
+            Map<String, Object> course = courseDao.getCourseById(courseid);
+            weixinAPI.sendGroupTextChatMessage(chatS, sessionInfo.getUserId(), "这里是【" + course.get("coursename").toString() + "】的学习小组，大家尽量讨论课程相关问题欧,本小组由天天微学提供技术。");
+            weixinAPI.sendGroupTextChatMessage(chatS, sessionInfo.getUserId(), gdesc);
+            result.setSuccess(true);
+            result.setMsg("学习小组创建成功");
+            //保存小组
+            for (String guser : gusers) {
+                groupUserDao.save(guser, chatS);
+            }
+            groupDao.save(chatS, gname, gdesc, courseid, null, sessionInfo.getCorpid());
+        } catch (WeixinException e) {
+            result.setSuccess(false);
+            result.setSysErrorMsg();
+            System.out.println(e.getLocalizedMessage());
+        }
+        return result;
+    }
+
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public void edit(HttpSession session, HttpServletRequest request, HttpServletResponse response, Course course) {
@@ -100,7 +213,7 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/addJsp", method = RequestMethod.GET)
-    public String addJsp(HttpSession session, int type,Page page, HttpServletRequest request, String proId) {
+    public String addJsp(HttpSession session, int type, Page page, HttpServletRequest request, String proId) {
 
         List<User> users = new ArrayList<User>(0);
         try {
@@ -109,7 +222,7 @@ public class CourseController {
             e.printStackTrace();
         }
         SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
-        List<Map<String, Object>> projects = projectDao.getProjectListByCorpid(sessionInfo.getCorpid(),page);
+        List<Map<String, Object>> projects = projectDao.getProjectListByCorpid(sessionInfo.getCorpid(), page);
         request.setAttribute("type", type);
         request.setAttribute("proId", proId);
         request.setAttribute("projects", projects);
@@ -148,38 +261,34 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public void delete(String id, HttpServletRequest request, HttpServletResponse response) {
-
+    @ResponseBody
+    public Result delete(String id, HttpServletRequest request, HttpServletResponse response) {
+        Result result = new Result();
         courseDao.delete(id);
         courseUserDao.deleteUser(id);
         courseUserDao.deleteSpeaker(id);
         courseUserDao.deleteLeader(id);
-
-        try {
-            String path = request.getContextPath();
-            String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
-            response.sendRedirect(basePath + "/platform/course");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        result.setSuccess(true);
+        return result;
     }
 
     @RequestMapping(value = "/courseByproId", method = RequestMethod.GET)
     @ResponseBody
-    public Result courseByproId(String proid,HttpServletRequest request) {
+    public Result courseByproId(String proid, HttpServletRequest request) {
         Result result = new Result();
-        SessionInfo sessionInfo=WebUtils.getSessionInfo(request);
-        List<Map<String, Object>> courses = courseDao.getCoursesByProId(proid,sessionInfo.getCorpid());
+        SessionInfo sessionInfo = WebUtils.getSessionInfo(request);
+        List<Map<String, Object>> courses = courseDao.getCoursesByProId(proid, sessionInfo.getCorpid());
         result.setObj(courses);
         result.setSuccess(true);
         return result;
     }
+
     @RequestMapping(value = "/fuzerenById", method = RequestMethod.GET)
     @ResponseBody
-    public Result fuzerenById(String id,HttpServletRequest request) {
-        SessionInfo sessionInfo=WebUtils.getSessionInfo(request);
+    public Result fuzerenById(String id, HttpServletRequest request) {
+        SessionInfo sessionInfo = WebUtils.getSessionInfo(request);
         Result result = new Result();
-        List<Map<String, Object>> courses = courseDao.getCoursesByProId(id,sessionInfo.getCorpid());
+        List<Map<String, Object>> courses = courseDao.getCoursesByProId(id, sessionInfo.getCorpid());
         result.setObj(courses);
         result.setSuccess(true);
         return result;

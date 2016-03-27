@@ -5,7 +5,7 @@
     <parent>
         <artifactId>weixin4j</artifactId>
         <groupId>com.foxinmy</groupId>
-        <version>1.5.4-SNAPSHOT</version>
+        <version>1.6.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.1.0</version>
+            <version>2.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -25,6 +25,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>3.0.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.foxinmy</groupId>
+            <artifactId>weixin4j-qy</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -6,12 +6,12 @@ package com.foxinmy.weixin4j.type;
  * @className TradeType
  * @author jy
  * @date 2014年10月21日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public enum TradeType {
 	/**
-	 * H5页面上的JSAPI支付
+	 * JS支付
 	 */
 	JSAPI,
 	/**
@@ -19,11 +19,15 @@ public enum TradeType {
 	 */
 	MICROPAY,
 	/**
-	 * 扫描支付
+	 * 扫码支付
 	 */
 	NATIVE,
 	/**
 	 * APP支付
 	 */
-	APP;
+	APP,
+	/**
+	 * WAP支付
+	 */
+	WAP;
 }

@@ -20,7 +20,7 @@ import com.foxinmy.weixin4j.util.DateUtil;
  * @className CouponDetail
  * @author jy
  * @date 2015年3月27日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 @XmlRootElement
@@ -80,7 +80,6 @@ public class CouponDetail extends ApiResult {
 	@XmlElement(name = "coupon_type")
 	@JSONField(name = "coupon_type")
 	private int couponType;
-
 	/**
 	 * 代金券描述
 	 */

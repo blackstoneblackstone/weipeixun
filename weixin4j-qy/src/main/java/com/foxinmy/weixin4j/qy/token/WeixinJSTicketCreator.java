@@ -52,7 +52,7 @@ public class WeixinJSTicketCreator implements TokenCreator {
 		JSONObject result = response.getAsJson();
 		Token token = new Token(result.getString("ticket"));
 		token.setExpiresIn(result.getIntValue("expires_in"));
-		token.setTime(System.currentTimeMillis());
+		//token.setTime(System.currentTimeMillis());
 		return token;
 	}
 }

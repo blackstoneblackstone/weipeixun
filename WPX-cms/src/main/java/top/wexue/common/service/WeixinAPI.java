@@ -1,6 +1,5 @@
 package top.wexue.common.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.foxinmy.weixin4j.exception.WeixinException;
 import com.foxinmy.weixin4j.http.weixin.JsonResult;
 import com.foxinmy.weixin4j.model.*;
@@ -15,14 +14,15 @@ import com.foxinmy.weixin4j.qy.suite.WeixinTokenSuiteCreator;
 import com.foxinmy.weixin4j.qy.token.WeixinProviderTokenCreator;
 import com.foxinmy.weixin4j.qy.type.ChatType;
 import com.foxinmy.weixin4j.qy.type.InviteType;
+import com.foxinmy.weixin4j.qy.type.LoginTargetType;
 import com.foxinmy.weixin4j.qy.type.UserStatus;
 import com.foxinmy.weixin4j.token.RedisTokenStorager;
 import com.foxinmy.weixin4j.token.TokenHolder;
 import com.foxinmy.weixin4j.tuple.MpArticle;
+import com.foxinmy.weixin4j.tuple.Text;
 import com.foxinmy.weixin4j.type.MediaType;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
@@ -32,35 +32,51 @@ import java.util.List;
 @Service
 public class WeixinAPI {
 
-    private  MediaApi mediaApi;
-    private  MenuApi menuApi;
-    private  NotifyApi notifyApi;
-    private  PartyApi partyApi;
-    private  UserApi userApi;
-    private  TagApi tagApi;
-    private  HelperApi helperApi;
-    private  AgentApi agentApi;
-    private  BatchApi batchApi;
-    private  ChatApi chatApi;
+    private MediaApi mediaApi;
+    private MenuApi menuApi;
+    private NotifyApi notifyApi;
+    private PartyApi partyApi;
+    private UserApi userApi;
+    private TagApi tagApi;
+    private HelperApi helperApi;
+    private AgentApi agentApi;
+    private BatchApi batchApi;
+    private ChatApi chatApi;
+    private ProviderApi providerApi;
 
-    private  TokenHolder tokenHolder;
+    private TokenHolder tokenHolder;
 
 
     private String suiteId = "tj3e700c876e37c5a5";
     private String suiteSecret = "jNxEH7UABaHtrwOhGG2jBpUfU3x_EISNJTAGjjpYSGwFBmSSYZTb-Q9xsQgpyP4E";
 
-    public WeixinAPI() {
+    private String chatServerId = "tjf5217ebac93f0b28";
+    private String chatServerSecret = "eaBQNTXz0HkFn21iTUhuI--fBwc9wRtDn5Z3vohzYehBvgKoOghhkEn_9Cih8C80";
 
+    private String loginCorpID = "wxf54e1b5e0b62fa96";
+    private String providerSecret = "ggrJeFqKS-TzTP7HHnVRNnMdSuZLj4rlktt67Osjp5c4pMKn22zBZqY9uV3HqRNx";
+
+    RedisTokenStorager redisTokenStorager = new RedisTokenStorager("123.57.237.121", 6379, "wexuetop");
+
+    public WeixinAPI() {
+        TokenHolder tokenHolder = new TokenHolder(new WeixinProviderTokenCreator(loginCorpID, providerSecret), redisTokenStorager);
+        this.providerApi = new ProviderApi(tokenHolder, redisTokenStorager);
     }
+
     public void initWeixinAPI(String corpid) throws WeixinException {
-        RedisTokenStorager redisTokenStorager= new RedisTokenStorager("123.57.237.121", 6379,"wexuetop");
-        SuiteTicketHolder suiteTicketHolder=  new SuiteTicketHolder(suiteId, suiteSecret, redisTokenStorager);
-        TokenHolder token=new TokenHolder(new WeixinSuiteTokenCreator(suiteTicketHolder),redisTokenStorager);
-        SuitePerCodeHolder suitePerCodeHolder=new SuitePerCodeHolder(suiteId,redisTokenStorager);
-        TokenHolder tokenHolder = new TokenHolder(new WeixinTokenSuiteCreator(corpid,suitePerCodeHolder,token),
-                new RedisTokenStorager("123.57.237.121", 6379,"wexuetop"));
+        SuiteTicketHolder suiteTicketHolder = new SuiteTicketHolder(suiteId, suiteSecret, redisTokenStorager);
+        SuiteTicketHolder chatTicketHolder = new SuiteTicketHolder(chatServerId, chatServerSecret, redisTokenStorager);
+        TokenHolder token = new TokenHolder(new WeixinSuiteTokenCreator(suiteTicketHolder), redisTokenStorager);
+        SuitePerCodeHolder suitePerCodeHolder = new SuitePerCodeHolder(corpid, suiteId, redisTokenStorager);
+        TokenHolder tokenHolder = new TokenHolder(new WeixinTokenSuiteCreator(suitePerCodeHolder, token),
+                redisTokenStorager);
+
+        TokenHolder chatToken = new TokenHolder(new WeixinSuiteTokenCreator(chatTicketHolder), redisTokenStorager);
+        SuitePerCodeHolder chatPerCodeHolder = new SuitePerCodeHolder(corpid, chatServerId, redisTokenStorager);
+        TokenHolder chatTokenHolder = new TokenHolder(new WeixinTokenSuiteCreator(chatPerCodeHolder, chatToken), redisTokenStorager);
+
         this.tokenHolder = tokenHolder;
-            this.partyApi = new PartyApi(tokenHolder);
+        this.partyApi = new PartyApi(tokenHolder);
         this.userApi = new UserApi(tokenHolder);
         this.tagApi = new TagApi(tokenHolder);
         this.helperApi = new HelperApi(tokenHolder);
@@ -69,7 +85,8 @@ public class WeixinAPI {
         this.notifyApi = new NotifyApi(tokenHolder);
         this.menuApi = new MenuApi(tokenHolder);
         this.mediaApi = new MediaApi(tokenHolder);
-        this.chatApi = new ChatApi(tokenHolder);
+        this.chatApi = new ChatApi(chatTokenHolder);
+//        this.providerApi = new ProviderApi(tokenHolder, redisTokenStorager);
     }
 
     public TokenHolder getTokenHolder() {
@@ -103,7 +120,7 @@ public class WeixinAPI {
      * @see com.foxinmy.weixin4j.tuple.MpNews
      * @see com.foxinmy.weixin4j.qy.message.NotifyMessage
      */
-    public JSONObject sendNotifyMessage(NotifyMessage message)
+    public IdParameter sendNotifyMessage(NotifyMessage message)
             throws WeixinException {
         return notifyApi.sendNotifyMessage(message);
     }
@@ -188,9 +205,9 @@ public class WeixinAPI {
      * @see com.foxinmy.weixin4j.type.MediaType
      * @see {@link #downloadMedia(int, String)}
      */
-    public File downloadMediaFile(int agentid, String mediaId)
+    public MediaDownloadResult downloadMediaFile(int agentid, String mediaId)
             throws WeixinException {
-        return mediaApi.downloadMediaFile(agentid, mediaId);
+        return mediaApi.downloadMedia(agentid, mediaId);
     }
 
     /**
@@ -402,7 +419,6 @@ public class WeixinAPI {
      * @throws WeixinException
      * @see com.foxinmy.weixin4j.qy.api.MediaApi
      * @see com.foxinmy.weixin4j.qy.api.BatchApi
-     * @see {@link #replaceparty(String, Callback)}
      * @see <a
      * href="http://qydev.weixin.qq.com/wiki/index.php?title=%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%8E%A5%E5%8F%A3#.E9.80.9A.E8.AE.AF.E5.BD.95.E6.9B.B4.E6.96.B0">批量任务</a>
      */
@@ -499,7 +515,6 @@ public class WeixinAPI {
      * @see com.foxinmy.weixin4j.qy.model.User
      * @see com.foxinmy.weixin4j.qy.api.UserApi
      * @see {@link #getUser(String)}
-     * @see {@link #getUserIdByCode(String, int)}
      * @see <a
      * href="http://qydev.weixin.qq.com/wiki/index.php?title=%E4%BC%81%E4%B8%9A%E8%8E%B7%E5%8F%96code">企业获取code</a>
      * @see <a
@@ -522,7 +537,7 @@ public class WeixinAPI {
      * @see <a
      * href="http://qydev.weixin.qq.com/wiki/index.php?title=%E6%A0%B9%E6%8D%AEcode%E8%8E%B7%E5%8F%96%E6%88%90%E5%91%98%E4%BF%A1%E6%81%AF">根据code获取成员信息</a>
      */
-    public JSONObject getUserIdByCode(String code) throws WeixinException {
+    public String[] getUserIdByCode(String code) throws WeixinException {
         return userApi.getUserIdByCode(code);
     }
 
@@ -674,7 +689,7 @@ public class WeixinAPI {
      * href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%A0%87%E7%AD%BE#.E8.8E.B7.E5.8F.96.E6.A0.87.E7.AD.BE.E6.88.90.E5.91.98">获取标签成员说明</a>
      * @see com.foxinmy.weixin4j.qy.api.TagApi
      */
-    public List<User> getTagUsers(int tagId) throws WeixinException {
+    public Contacts getTagUsers(int tagId) throws WeixinException {
         return tagApi.getTagUsers(tagId);
     }
 
@@ -690,9 +705,10 @@ public class WeixinAPI {
      * href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%A0%87%E7%AD%BE#.E5.A2.9E.E5.8A.A0.E6.A0.87.E7.AD.BE.E6.88.90.E5.91.98">新增标签成员说明</a>
      * @see com.foxinmy.weixin4j.qy.api.TagApi
      */
-    public JsonResult addTagUsers(int tagId, List<String> userIds)
+    public IdParameter addTagUsers(int tagId, List<String> userIds,
+                                   List<Integer> partyIds)
             throws WeixinException {
-        return tagApi.addTagUsers(tagId, userIds);
+        return tagApi.addTagUsers(tagId, userIds, partyIds);
     }
 
     /**
@@ -707,9 +723,9 @@ public class WeixinAPI {
      * href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%A0%87%E7%AD%BE#.E5.88.A0.E9.99.A4.E6.A0.87.E7.AD.BE.E6.88.90.E5.91.98">删除标签成员说明</a>
      * @see com.foxinmy.weixin4j.qy.api.TagApi
      */
-    public JsonResult deleteTagUsers(int tagId, List<String> userIds)
+    public IdParameter deleteTagUsers(int tagId, List<String> userIds, List<Integer> partyIds)
             throws WeixinException {
-        return tagApi.deleteTagUsers(tagId, userIds);
+        return tagApi.deleteTagUsers(tagId, userIds, partyIds);
     }
 
     /**
@@ -841,8 +857,6 @@ public class WeixinAPI {
      * @throws WeixinException
      * @see com.foxinmy.weixin4j.qy.api.MediaApi
      * @see com.foxinmy.weixin4j.qy.api.BatchApi
-     * @see {@link #syncuser(String, Callback)}
-     * @see {@link #replaceuser(String, Callback)}
      * @see <a
      * href="http://qydev.weixin.qq.com/wiki/index.php?title=%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%8E%A5%E5%8F%A3#.E9.80.9A.E8.AE.AF.E5.BD.95.E6.9B.B4.E6.96.B0">批量任务</a>
      */
@@ -1035,6 +1049,34 @@ public class WeixinAPI {
             throws WeixinException {
         return chatApi.sendChatMessage(message);
     }
+
+    public JsonResult sendGroupTextChatMessage(String chatId, String senderId, String messageText)
+            throws WeixinException {
+        Text text = new Text(messageText);
+        ChatMessage chatMessage = new ChatMessage(chatId, ChatType.group, senderId, text);
+        return chatApi.sendChatMessage(chatMessage);
+    }
+
+    /*获得授权登陆用户信息*/
+    public OUserInfo getOUserInfoByCode(String authCode) throws WeixinException {
+        return providerApi.getOUserInfoByCode(authCode);
+    }
+
+    /*获得发消息地址*/
+    public String loginSendMsg(String corpid, int agentId) throws WeixinException {
+        return providerApi.getLoginUrl(corpid, LoginTargetType.send_msg, agentId);
+    }
+
+    /*获得通讯录地址*/
+    public String loginAddressBook(String corpid) throws WeixinException {
+        return providerApi.getLoginUrl(corpid, LoginTargetType.contact, 0);
+    }
+
+    /*third_admin*/
+    public String loginThirdAdmin(String corpid) throws WeixinException {
+        return providerApi.getLoginUrl(corpid, LoginTargetType.third_admin, 0);
+    }
+
 
     public final static String VERSION = "1.5.3";
 

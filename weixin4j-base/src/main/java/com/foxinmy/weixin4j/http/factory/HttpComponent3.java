@@ -7,10 +7,8 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.net.ssl.SSLContext;
@@ -34,7 +32,6 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 
 import com.foxinmy.weixin4j.http.AbstractHttpClient;
-import com.foxinmy.weixin4j.http.HttpClient;
 import com.foxinmy.weixin4j.http.HttpClientException;
 import com.foxinmy.weixin4j.http.HttpHeaders;
 import com.foxinmy.weixin4j.http.HttpMethod;
@@ -52,39 +49,57 @@ import com.foxinmy.weixin4j.util.StringUtil;
  * @className HttpComponent3
  * @author jy
  * @date 2015年8月18日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
-public class HttpComponent3 extends AbstractHttpClient implements HttpClient {
+public class HttpComponent3 extends AbstractHttpClient {
 
 	private final org.apache.commons.httpclient.HttpClient httpClient;
 
-	private final Map<HttpMethod, org.apache.commons.httpclient.HttpMethod> methodMap;
-
 	public HttpComponent3(org.apache.commons.httpclient.HttpClient httpClient) {
 		this.httpClient = httpClient;
-		this.methodMap = new HashMap<HttpMethod, org.apache.commons.httpclient.HttpMethod>();
-		methodMap.put(HttpMethod.GET, new GetMethod());
-		methodMap.put(HttpMethod.HEAD, new HeadMethod());
-		methodMap.put(HttpMethod.POST, new PostMethod());
-		methodMap.put(HttpMethod.PUT, new PutMethod());
-		methodMap.put(HttpMethod.DELETE, new DeleteMethod());
-		methodMap.put(HttpMethod.OPTIONS, new OptionsMethod());
+	}
+
+	private org.apache.commons.httpclient.HttpMethod createHttpMethod(
+			HttpMethod method, java.net.URI url) throws HttpClientException {
+		org.apache.commons.httpclient.HttpMethod httpMethod = null;
+		try {
+			URI uri = new URI(url.toString(), false, Consts.UTF_8.name());
+			if (method == HttpMethod.GET) {
+				httpMethod = new GetMethod();
+			} else if (method == HttpMethod.HEAD) {
+				httpMethod = new HeadMethod();
+			} else if (method == HttpMethod.POST) {
+				httpMethod = new PostMethod();
+			} else if (method == HttpMethod.PUT) {
+				return new PutMethod();
+			} else if (method == HttpMethod.DELETE) {
+				httpMethod = new DeleteMethod();
+			} else if (method == HttpMethod.OPTIONS) {
+				httpMethod = new OptionsMethod();
+			} else if (method == HttpMethod.TRACE) {
+				return new TraceMethod(uri.getEscapedURI());
+			} else {
+				throw new HttpClientException("unknown request method "
+						+ method + " for " + uri);
+			}
+			httpMethod.setURI(uri);
+		} catch (IOException e) {
+			throw new HttpClientException("I/O error on " + method.name()
+					+ " setURI for \"" + url.toString() + "\":"
+					+ e.getMessage(), e);
+		}
+		return httpMethod;
 	}
 
 	@Override
 	public HttpResponse execute(HttpRequest request) throws HttpClientException {
 		HttpResponse response = null;
 		try {
-			URI uri = new URI(request.getURI().toString(), false,
-					Consts.UTF_8.name());
-			org.apache.commons.httpclient.HttpMethod httpMethod = methodMap
-					.get(request.getMethod());
-			if (request.getMethod() == HttpMethod.TRACE) {
-				httpMethod = new TraceMethod(uri.getEscapedURI());
-			} else {
-				httpMethod.setURI(uri);
-			}
+			org.apache.commons.httpclient.HttpMethod httpMethod = createHttpMethod(
+					request.getMethod(), request.getURI());
+			boolean useSSL = "https".equals(request.getURI().getScheme());
+			SSLContext sslContext = null;
 			HttpParams params = request.getParams();
 			if (params != null) {
 				Proxy proxy = params.getProxy();
@@ -94,34 +109,51 @@ public class HttpComponent3 extends AbstractHttpClient implements HttpClient {
 					httpClient.getHostConfiguration().setProxy(
 							socketAddress.getHostName(),
 							socketAddress.getPort());
+					useSSL = false;
 				}
-				SSLContext sslContext = params.getSSLContext();
-				if (sslContext != null) {
-					Protocol.registerProtocol("https", new Protocol("https",
-							new SSLProtocolSocketFactory(sslContext), 443));
-				}
+				sslContext = params.getSSLContext();
 				httpClient.getHttpConnectionManager().getParams()
 						.setConnectionTimeout(params.getConnectTimeout());
 				httpClient.getHttpConnectionManager().getParams()
 						.setSendBufferSize(params.getChunkSize());
-				httpMethod.getParams().setUriCharset(Consts.UTF_8.name());
 				httpMethod.getParams().setSoTimeout(params.getSocketTimeout());
+				httpMethod.getParams().setHttpElementCharset(Consts.UTF_8.name());
+				httpMethod.getParams().setUriCharset(Consts.UTF_8.name());
 				httpMethod.getParams().setContentCharset(Consts.UTF_8.name());
+			}
+			if (useSSL) {
+				if (sslContext == null) {
+					sslContext = HttpClientFactory.allowSSLContext();
+				}
+				Protocol.registerProtocol("https", new Protocol("https",
+						new SSLProtocolSocketFactory(sslContext), 443));
 			}
 			com.foxinmy.weixin4j.http.HttpHeaders headers = request
 					.getHeaders();
-			if (headers != null) {
-				for (Iterator<Entry<String, List<String>>> headerIterator = headers
-						.entrySet().iterator(); headerIterator.hasNext();) {
-					Entry<String, List<String>> header = headerIterator.next();
-					if (HttpHeaders.COOKIE.equalsIgnoreCase(header.getKey())) {
+			if (headers == null) {
+				headers = new HttpHeaders();
+			}
+			if (!headers.containsKey(HttpHeaders.HOST)) {
+				headers.set(HttpHeaders.HOST, request.getURI().getHost());
+			}
+			// Add default accept headers
+			if (!headers.containsKey(HttpHeaders.ACCEPT)) {
+				headers.set(HttpHeaders.ACCEPT, "*/*");
+			}
+			// Add default user agent
+			if (!headers.containsKey(HttpHeaders.USER_AGENT)) {
+				headers.set(HttpHeaders.USER_AGENT, "apache/httpclient3");
+			}
+			for (Iterator<Entry<String, List<String>>> headerIterator = headers
+					.entrySet().iterator(); headerIterator.hasNext();) {
+				Entry<String, List<String>> header = headerIterator.next();
+				if (HttpHeaders.COOKIE.equalsIgnoreCase(header.getKey())) {
+					httpMethod.setRequestHeader(header.getKey(),
+							StringUtil.join(header.getValue(), ';'));
+				} else {
+					for (String headerValue : header.getValue()) {
 						httpMethod.setRequestHeader(header.getKey(),
-								StringUtil.join(header.getValue(), ';'));
-					} else {
-						for (String headerValue : header.getValue()) {
-							httpMethod.addRequestHeader(header.getKey(),
-									headerValue != null ? headerValue : "");
-						}
+								headerValue != null ? headerValue : "");
 					}
 				}
 			}
@@ -154,6 +186,7 @@ public class HttpComponent3 extends AbstractHttpClient implements HttpClient {
 			}
 			httpClient.executeMethod(httpMethod);
 			response = new HttpComponent3Response(httpMethod);
+			handleResponse(response);
 		} catch (IOException e) {
 			throw new HttpClientException("I/O error on "
 					+ request.getMethod().name() + " request for \""

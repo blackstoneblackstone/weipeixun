@@ -20,9 +20,21 @@ public class CourseDao {
     private JdbcTemplate jdbcTemplate;
 
 
+    public List<Map<String, Object>> getCoursesByProId(String projectId, String corpid, Page page) {
+        String sql = "SELECT * from course where projectid=? and corpid=? ORDER BY starttime DESC limit ?,?";
+        List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, projectId, corpid, (page.getStartPage() - 1) * page.getPageSize(), page.getPageSize());
+        return result;
+    }
+
     public List<Map<String, Object>> getCoursesByProId(String projectId, String corpid) {
-        String sql = "SELECT * from course where projectid=? and corpid=?";
+        String sql = "SELECT * from course where projectid=? and corpid=? ";
         List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, projectId, corpid);
+        return result;
+    }
+
+    public List<Map<String, Object>> getCourses(String corpid, Page page) {
+        String sql = "SELECT * from course where corpid=? ORDER BY starttime DESC limit ?,?";
+        List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, corpid, (page.getStartPage() - 1) * page.getPageSize(), page.getPageSize());
         return result;
     }
 
@@ -47,6 +59,13 @@ public class CourseDao {
         return result;
     }
 
+    public List<Map<String, Object>> getUsersByCourseid(String corpId, String courseid) {
+        String sql = "SELECT * from auth_user,course_user where auth_user.userid=course_user.userid AND corpid=? and course_user.courseid=?";
+        List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, corpId, courseid);
+        return result;
+    }
+
+
     public List<Map<String, Object>> getPublicCourses(String corpId, Page page) {
         String sql = "SELECT * from course where corpid=? and coursetype=1  order by starttime DESC limit ?,?";
         System.out.println((page.getStartPage() - 1) * page.getPageSize() + ">>>" + page.getPageSize());
@@ -55,7 +74,7 @@ public class CourseDao {
     }
 
     public Map<String, Object> getCourseById(String id) {
-        String sql = "SELECT c.*,s.name teacher from course c,speaker s,course_speaker cs where c.id=? and c.id=cs.courseid and cs.speakerid=s.id";
+        String sql = "SELECT * from course where id=?";
         Map<String, Object> result = this.jdbcTemplate.queryForMap(sql, id);
         return result;
     }
@@ -85,7 +104,7 @@ public class CourseDao {
 
     public int delete(String projectid) {
         try {
-            String sql = "DELETE from project_user where projectid=?";
+            String sql = "DELETE from course where id=?";
             int result = this.jdbcTemplate.update(sql, projectid);
             return result;
         } catch (EmptyResultDataAccessException e) {

@@ -18,8 +18,13 @@ public class CourseUserDao {
 
 
     public List<Map<String, Object>> getUserListByProjectId(String projectId) {
-        String sql = "SELECT * from project_user where projectid=?";
+        String sql = "SELECT auth_user.* from project_user,auth_user where project_user.userid=auth_user.userid AND projectid=?";
         List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, projectId);
+        return result;
+    }
+    public List<Map<String, Object>> getUserListByCourseId(String courseid) {
+        String sql = "SELECT auth_user.* from course_user,auth_user where course_user.userid=auth_user.userid AND courseid=?";
+        List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, courseid);
         return result;
     }
 
@@ -61,7 +66,7 @@ public class CourseUserDao {
     }
     public int deleteSpeaker(String courseid) {
         try {
-            String sql = "DELETE from project_speaker where courseid=?";
+            String sql = "DELETE from course_speaker where courseid=?";
             int result = this.jdbcTemplate.update(sql, courseid);
             return result;
         } catch (EmptyResultDataAccessException e) {

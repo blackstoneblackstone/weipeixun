@@ -87,3 +87,58 @@
 * 2015-08-13
 
   + version upgrade to 1.0.5
+  
+* 2015-09-11
+
+  + version upgrade to 1.1.0
+  
+* 2015-09-16
+
+  + version upgrade to 1.1.1
+  
+* 2015-09-21
+
+  + version upgrade to 1.1.2
+  
+* 2015-10-25
+
+  + 新增认证通知事件
+  
+* 2015-11-09
+
+  + version upgrade to 1.1.3
+  
+* 2015-12-08
+  
+  + version upgrade to 1.1.4
+  
+* 2015-12-21
+  
+  + WeixinMessageHanlder中新增weight接口
+  
+* 2015-12-25
+  
+  + DigestUtil 重命名为 DigestUtils
+  
+* 2015-12-26
+  
+  + WeixinMessageInterceptor加入weight权重接口
+  
+  + 移入weixin4j下模块化
+  
+  + 删除无用的工具类并重新整理
+  
+* 2015-12-31
+  
+  + version upgrade to 1.1.5
+  
+* 2015-02-04
+
+  + version upgrade to 1.1.6
+  
+  
+* 2015-03-12
+
+  + 修改ClassUtil获取class不到的bug
+  
+  + 新增MultipleMessageHandlerAdapter多个消息适配类

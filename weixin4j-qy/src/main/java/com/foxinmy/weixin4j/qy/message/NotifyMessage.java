@@ -7,12 +7,12 @@ import com.foxinmy.weixin4j.qy.model.IdParameter;
 import com.foxinmy.weixin4j.tuple.NotifyTuple;
 
 /**
- * 客服消息对象
+ * 消息提醒对象
  * 
  * @className NotifyMessage
  * @author jy
  * @date 2014年11月22日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see com.foxinmy.weixin4j.tuple.Text
  * @see com.foxinmy.weixin4j.tuple.Image
  * @see com.foxinmy.weixin4j.tuple.Voice
@@ -48,7 +48,7 @@ public class NotifyMessage implements Serializable {
 	private IdParameter target;
 
 	public NotifyMessage(int agentid, NotifyTuple tuple) {
-		this(agentid, tuple, IdParameter.get(), false);
+		this(agentid, tuple, new IdParameter(), false);
 	}
 
 	public NotifyMessage(int agentId, NotifyTuple tuple, IdParameter target,
