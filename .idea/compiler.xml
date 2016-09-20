@@ -23,7 +23,6 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="weixin4j-base" />
-        <module name="weixin4j-cms" />
         <module name="weixin4j-mp" />
         <module name="weixin4j-qy" />
         <module name="weixin4j-server" />
@@ -32,18 +31,15 @@
         <module name="WPX-web" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.6">
-      <module name="cms" target="1.7" />
-      <module name="weixin4j" target="1.7" />
-      <module name="weixin4j-base" target="1.7" />
-      <module name="weixin4j-cms" target="1.7" />
-      <module name="weixin4j-mp" target="1.7" />
-      <module name="weixin4j-qy" target="1.7" />
-      <module name="weixin4j-server" target="1.7" />
-      <module name="WPX" target="1.7" />
-      <module name="WPX-base" target="1.7" />
-      <module name="WPX-cms" target="1.7" />
-      <module name="WPX-web" target="1.7" />
+    <bytecodeTargetLevel>
+      <module name="weixin4j" target="1.6" />
+      <module name="weixin4j-base" target="1.6" />
+      <module name="weixin4j-mp" target="1.6" />
+      <module name="weixin4j-qy" target="1.6" />
+      <module name="weixin4j-server" target="1.6" />
+      <module name="WPX-base" target="1.6" />
+      <module name="WPX-cms" target="1.6" />
+      <module name="WPX-web" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>

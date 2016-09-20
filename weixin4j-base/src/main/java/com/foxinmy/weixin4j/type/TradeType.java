@@ -4,7 +4,7 @@ package com.foxinmy.weixin4j.type;
  * 微信支付类型
  * 
  * @className TradeType
- * @author jy
+ * @author jinyu(foxinmy@gmail.com)
  * @date 2014年10月21日
  * @since JDK 1.6
  * @see
@@ -13,21 +13,36 @@ public enum TradeType {
 	/**
 	 * JS支付
 	 */
-	JSAPI,
+	JSAPI(true),
 	/**
-	 * 刷卡支付
+	 * 刷卡支付:不需要设置TradeType参数
 	 */
-	MICROPAY,
+	MICROPAY(false),
 	/**
 	 * 扫码支付
 	 */
-	NATIVE,
+	NATIVE(true),
 	/**
 	 * APP支付
 	 */
-	APP,
+	APP(true),
 	/**
 	 * WAP支付
 	 */
-	WAP;
+	WAP(true);
+
+	boolean isPayRequestParameter;
+
+	private TradeType(boolean isPayRequestParameter) {
+		this.isPayRequestParameter = isPayRequestParameter;
+	}
+
+	/**
+	 * 是否作为支付请求参数
+	 * 
+	 * @return
+	 */
+	public boolean isPayRequestParameter() {
+		return isPayRequestParameter;
+	}
 }

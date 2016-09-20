@@ -3,7 +3,7 @@
 
     <contextName>weixin-scene</contextName>
 
-    <property name="root.logger.level" value="DEBUG"/>
+    <property name="root.logger.level" value="ERROR"/>
     <property name="log.path" value="/var/log/cms" />
     <property name="app.name" value="scene" />
     <property name="app.version" value="1.0" />

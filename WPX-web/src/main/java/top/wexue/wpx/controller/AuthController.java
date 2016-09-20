@@ -3,20 +3,19 @@ package top.wexue.wpx.controller;
 import com.foxinmy.weixin4j.exception.WeixinException;
 import com.foxinmy.weixin4j.qy.model.OUserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import top.wexue.dao.AuthCorpInfoDAO;
-import top.wexue.dao.AuthDepartmentDao;
-import top.wexue.dao.AuthInfoDAO;
+import top.wexue.base.dao.AuthCorpInfoDAO;
+import top.wexue.base.dao.AuthDepartmentDao;
+import top.wexue.base.dao.AuthInfoDAO;
 import top.wexue.wpx.api.WpxAPI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +33,13 @@ public class AuthController {
     private AuthInfoDAO authInfoDAO;
     @Autowired
     private AuthDepartmentDao authDepartmentDao;
+
+    @Value("#{configProperties['server.cms.url']}")
+    private String cmsUrl;
+
+
+    @Value("#{configProperties['server.web.url']}")
+    private String webUrl;
 
     @RequestMapping(value = "/suite", method = RequestMethod.GET)
     public String Auth(HttpServletRequest request) {
@@ -60,7 +66,7 @@ public class AuthController {
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public void login(String auth_code,HttpServletResponse response,String state, String expires_in) {
-        String loginAuthURL = "http://www.wexue.top:8080/qyauth?auth_code="+auth_code+"&state="+state+"&expires_in="+expires_in;
+        String loginAuthURL = cmsUrl+"/qyauth?auth_code="+auth_code+"&state="+state+"&expires_in="+expires_in;
         try {
             response.sendRedirect(loginAuthURL);
         } catch (IOException e) {
@@ -92,7 +98,7 @@ public class AuthController {
                 re = re + authDepartmentDao.insert(oUserInfo, wpxAPI.getSuiteId());
             }
             msg = wpxAPI.createMenu(oUserInfo.getCorpInfo().getCorpId(), oUserInfo);
-            response.sendRedirect("http://www.wexue.top:8080/registJsp?corpid=" + oUserInfo.getCorpInfo().getCorpId() + "&userheader=" + URLEncoder.encode(oUserInfo.getCorpInfo().getSquareLogoUrl(), "utf-8"));
+            response.sendRedirect(cmsUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -102,19 +108,19 @@ public class AuthController {
     public void authUser(String corpId, String state, HttpServletResponse response, HttpServletRequest request) {
         String redirectUri = "";
         if ("webportal".equals(state)) {
-            redirectUri = "http://www.wexue.top/pxkc/portalWebJsp";
+            redirectUri = webUrl+"/pxkc/portalWebJsp";
         }
         if ("public".equals(state)) {
-            redirectUri = "http://www.wexue.top/pxkc/publicCourseJsp";
+            redirectUri = webUrl+"/pxkc/publicCourseJsp";
         }
         if ("require".equals(state)) {
-            redirectUri = "http://www.wexue.top/pxkc/requiredCourseJsp";
+            redirectUri = webUrl+"/pxkc/requiredCourseJsp";
         }
         if ("mycourse".equals(state)) {
-            redirectUri = "http://www.wexue.top/wdkc/myCourseJsp";
+            redirectUri = webUrl+"/wdkc/myCourseJsp";
         }
         if ("ordercourse".equals(state)) {
-            redirectUri = "http://www.wexue.top/wdkc/orderCourseJsp";
+            redirectUri = webUrl+"/wdkc/orderCourseJsp";
         }
         String Url = wpxAPI.getAuthUserInfoUrl(redirectUri, corpId, corpId);
         try {

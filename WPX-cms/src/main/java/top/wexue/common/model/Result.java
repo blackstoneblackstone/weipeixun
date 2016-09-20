@@ -1,50 +1,58 @@
 package top.wexue.common.model;
 
+
 /**
- * 
  * JSON模型
- * 
+ * <p>
  * 用户后台向前台返回的JSON对象
- * 
+ *
  * @author lihb
- * 
  */
+
 public class Result implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1274608835654709276L;
+    private static final long serialVersionUID = -1274608835654709276L;
+    public Result(){
 
-	private boolean success = false;
+    }
+    public Result(boolean success, String msg) {
+        this.success = success;
+        this.msg = msg;
+    }
 
-	private String msg = null;
+    private boolean success = false;
 
-	private Object obj = null;
+    private String msg = null;
 
-	public boolean isSuccess() {
-		return success;
-	}
+    private Object obj = null;
 
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
+    public boolean isSuccess() {
+        return success;
+    }
 
-	public String getMsg() {
-		return msg;
-	}
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
 
-	public void setMsg(String msg) {
-		this.msg = msg;
-	}
-	//定制化错误
-	public void setSysErrorMsg() {
-		this.msg = "系统错误，程序猿小哥走神了";
-	}
+    public String getMsg() {
+        return msg;
+    }
 
-	public Object getObj() {
-		return obj;
-	}
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 
-	public void setObj(Object obj) {
-		this.obj = obj;
-	}
+    //定制化错误
+    public void setSysErrorMsg() {
+        this.msg = "系统错误，程序猿小哥走神了";
+    }
+
+    public Object getObj() {
+        return obj;
+    }
+
+    public void setObj(Object obj) {
+        this.obj = obj;
+    }
 
 }

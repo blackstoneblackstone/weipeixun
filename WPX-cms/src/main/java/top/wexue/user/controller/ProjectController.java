@@ -4,11 +4,11 @@ import com.foxinmy.weixin4j.qy.model.ChatInfo;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.wexue.common.model.Result;
 import top.wexue.common.service.WeixinAPI;
-import top.wexue.dao.GroupDao;
-import top.wexue.dao.GroupUserDao;
-import top.wexue.model.Page;
-import top.wexue.utils.BaseMethod;
-import top.wexue.utils.Constants;
+import top.wexue.base.dao.GroupDao;
+import top.wexue.base.dao.GroupUserDao;
+import top.wexue.base.model.Page;
+import top.wexue.base.utils.BaseMethod;
+import top.wexue.base.utils.Constants;
 import com.foxinmy.weixin4j.exception.WeixinException;
 import com.foxinmy.weixin4j.qy.model.User;
 import com.foxinmy.weixin4j.qy.type.UserStatus;
@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import top.wexue.dao.ProjectDao;
-import top.wexue.dao.ProjectLeaderDao;
-import top.wexue.model.SessionInfo;
+import top.wexue.base.dao.ProjectDao;
+import top.wexue.base.dao.ProjectLeaderDao;
+import top.wexue.common.model.SessionInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +40,6 @@ public class ProjectController {
     ProjectLeaderDao projectLeaderDao;
     @Autowired
     private GroupDao groupDao;
-    @Autowired
     WeixinAPI weixinAPI;
     @Autowired
     private GroupUserDao groupUserDao;

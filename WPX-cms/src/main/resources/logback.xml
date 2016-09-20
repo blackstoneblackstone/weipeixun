@@ -3,7 +3,7 @@
 
     <contextName>WPX-cms</contextName>
 
-    <property name="root.logger.level" value="DEBUG"/>
+    <property name="root.logger.level" value="ERROR"/>
     <property name="log.path" value="/Users/lihb/Desktop/log"/>
     <property name="app.name" value="WPX-cms"/>
     <property name="app.version" value="1.0"/>

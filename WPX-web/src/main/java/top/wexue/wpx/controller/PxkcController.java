@@ -1,23 +1,21 @@
 package top.wexue.wpx.controller;
 
-import com.foxinmy.weixin4j.exception.WeixinException;
 import com.foxinmy.weixin4j.qy.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import top.wexue.dao.*;
-import top.wexue.model.Page;
-import top.wexue.model.SessionInfo;
+import top.wexue.base.dao.AuthUserDao;
+import top.wexue.base.dao.CourseDao;
+import top.wexue.base.dao.PortalDao;
+import top.wexue.base.dao.ProjectDao;
+import top.wexue.base.model.Page;
+import top.wexue.base.model.SessionInfo;
 import top.wexue.wpx.api.WpxAPI;
 import top.wexue.wpx.utils.WebUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +36,7 @@ public class PxkcController {
     @Autowired
     private AuthUserDao authUserDao;
     @Autowired
-    private WebTemplateDao webTemplateDao;
+    private PortalDao webTemplateDao;
 
     @RequestMapping(value = "/publicCourseJsp", method = RequestMethod.GET)
     public String publicCourseJsp(String code, String state, HttpServletRequest request) {
@@ -58,8 +56,9 @@ public class PxkcController {
 
     @RequestMapping(value = "/requiredCourseDetailJsp", method = RequestMethod.GET)
     public String requiredCourseDetailJsp(String courseid, String userid, HttpServletRequest request) {
+        SessionInfo sessionInfo=WebUtils.getSessionInfo(request);
         Map<String, Object> course = courseDao.getCourseById(courseid);
-        Map<String, Object> user = authUserDao.getUserById(userid);
+        Map<String, Object> user = authUserDao.getUserById(userid,sessionInfo.getCorpid());
         request.setAttribute("course", course);
         request.setAttribute("user", user);
         return "wx/pxkc/requiredCourseDetail";
@@ -125,15 +124,6 @@ public class PxkcController {
         request.setAttribute("project", project);
         request.setAttribute("user", sessionInfo);
         return "wx/pxkc/projectDetail";
-    }
-
-    @RequestMapping(value = "/portalWebJsp", method = RequestMethod.GET)
-    public String portalWebJsp(String code, String state, HttpServletRequest request) {
-        User user = wpxAPI.getCurrentUser(code, state);
-        WebUtils.setSessionInfo(request, user, state);
-        Map<String,Object> map= webTemplateDao.getTemplateByCorpId(state);
-        request.setAttribute("templateData",map.get("data"));
-        return "wx/pxkc/portalWeb";
     }
 
     @RequestMapping(value = "/requireCourseList", method = RequestMethod.GET)

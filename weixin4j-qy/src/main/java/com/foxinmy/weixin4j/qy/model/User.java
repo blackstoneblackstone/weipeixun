@@ -5,16 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.foxinmy.weixin4j.model.Gender;
 import com.foxinmy.weixin4j.qy.type.UserStatus;
+import com.foxinmy.weixin4j.type.Gender;
+import com.foxinmy.weixin4j.util.NameValue;
 
 /**
  * 部门成员对象
- * 
+ *
  * @className User
- * @author jy
+ * @author jinyu(foxinmy@gmail.com)
  * @date 2014年11月19日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see <a
  *      href="http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%88%90%E5%91%98">管理成员说明</a>
  */
@@ -31,7 +32,7 @@ public class User implements Serializable {
 	 */
 	private String name;
 	/**
-	 * 非必须 成员所属部门id列表。注意，每个部门的直属员工上限为1000个
+	 * 非必须 成员所属部门id列表,不超过20个
 	 */
 	@JSONField(name = "department")
 	private List<Integer> partyIds;
@@ -68,10 +69,6 @@ public class User implements Serializable {
 	 * 关注状态: 1=已关注，2=已冻结，4=未关注
 	 */
 	private Integer status;
-	/**
-	 * 启用/禁用成员。1表示启用成员，0表示禁用成员
-	 */
-	private Integer enable;
 	/**
 	 * 非必须 扩展属性。扩展属性需要在WEB管理端创建后才生效，否则忽略未知属性的赋值
 	 */
@@ -159,20 +156,16 @@ public class User implements Serializable {
 		return status;
 	}
 
-	public Integer getEnable() {
-		return enable;
+	@JSONField(serialize = false)
+	public Boolean getFormatEnable() {
+		if (status != null) {
+			return status.intValue() != 2;
+		}
+		return Boolean.FALSE;
 	}
 
 	public void setEnable(boolean enable) {
-		this.enable = enable ? 1 : 0;
-	}
-
-	@JSONField(serialize = false)
-	public boolean getFormatEnable() {
-		if (enable != null) {
-			return enable.intValue() == 1;
-		}
-		return false;
+		this.status = enable ? 1 : 0;
 	}
 
 	public List<NameValue> getExtattr() {
@@ -237,8 +230,29 @@ public class User implements Serializable {
 		this.status = status;
 	}
 
-	public void setEnable(Integer enable) {
-		this.enable = enable;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (userId == null) {
+			if (other.userId != null)
+				return false;
+		} else if (!userId.equals(other.userId))
+			return false;
+		return true;
 	}
 
 	@Override
@@ -247,6 +261,6 @@ public class User implements Serializable {
 				+ partyIds + ", position=" + position + ", mobile=" + mobile
 				+ ", gender=" + gender + ", tel=" + tel + ", email=" + email
 				+ ", weixinId=" + weixinId + ", avatar=" + avatar + ", status="
-				+ status + ", enable=" + enable + ", extattr=" + extattr + "]";
+				+ status + ", extattr=" + extattr + "]";
 	}
 }

@@ -1,15 +1,15 @@
 ulimit -n 110000
 #JDK home
-JAVA_HOME="/usr/local/java/"
+JAVA_HOME="/opt/jdk1.7.0_75/"
  
 #executing user
 RUNNING_USER=root
  
 #Run home
-APP_HOME="/usr/local/weixin/weixin4j-server"
+APP_HOME="/opt/weipeixun/server/"
  
 #main class
-APP_MAINCLASS=WeixinServerBootstrap.class
+APP_MAINCLASS=com/foxinmy/weixin4j/server/startup/WeixinServerBootstrap
  
 #classpath
 CLASSPATH=$APP_HOME/classes

@@ -16,8 +16,9 @@ import com.foxinmy.weixin4j.token.RedisTokenStorager;
 import com.foxinmy.weixin4j.token.TokenHolder;
 import com.foxinmy.weixin4j.type.ButtonType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import top.wexue.dao.AuthCorpInfoDAO;
+import top.wexue.base.dao.AuthCorpInfoDAO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,12 @@ public class WpxAPI {
         return suiteId;
     }
 
+    @Value("#{configProperties['server.web.url']}")
+    private String webUrl;
+
+
+    @Value("#{configProperties['qy_redirect_domain']}")
+    private String redirectDomain;
 
     public SuiteApi suiteApi;
     public SuiteApi serverApi;
@@ -45,7 +52,7 @@ public class WpxAPI {
     AuthCorpInfoDAO authCorpInfoDAO;
 
     public WpxAPI() {
-        RedisTokenStorager redisTokenStorager = new RedisTokenStorager();
+        RedisTokenStorager redisTokenStorager = new RedisTokenStorager("123.57.237.121",6379,"wexuetop");
         suiteApi = new SuiteApi(new SuiteTicketHolder(suiteId, suiteSecret, redisTokenStorager));
         serverApi = new SuiteApi(new SuiteTicketHolder(serverId, serverSecret, redisTokenStorager));
         oauthApi = new OauthApi();
@@ -53,13 +60,13 @@ public class WpxAPI {
 
     public String getSuiteAuthorizeURL() throws WeixinException {
         TokenHolder tokenHolder = suiteApi.getPreCodeHolder();
-        String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(suiteId, tokenHolder.getAccessToken(), "http://www.wexue.top/auth/getauthcode", "suite");
+        String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(suiteId, tokenHolder.getAccessToken(), "http://www.wexue.top:8081/auth/getauthcode", "suite");
         return suiteAuthorizeURL;
     }
 
     public String getServerAuthorizeURL() throws WeixinException {
         TokenHolder tokenHolder = serverApi.getPreCodeHolder();
-        String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(serverId, tokenHolder.getAccessToken(), "http://www.wexue.top/auth/getauthcode", "server");
+        String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(serverId, tokenHolder.getAccessToken(), "http://www.wexue.top:8081/auth/getauthcode", "server");
         return suiteAuthorizeURL;
     }
 
@@ -88,8 +95,8 @@ public class WpxAPI {
                 //http://www.wexue.top/pxkc/authUser?corpId=wxf54e1b5e0b62fa96&state=wxf54e1b5e0b62fa96
                 //Button xueyuan = new Button("学院门户", "http://www.wexue.top/WPX-web/pxkc/portalWebJsp?corpId="+oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
                 //Button xueyuan = new Button("学院门户", "http://www.wexue.top/pxkc/portalWebJsp?corpId="+oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
-                Button gongkai = new Button("公开课", "http://www.wexue.top/auth/authUser?state=public&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
-                Button bixiu = new Button("必修课", "http://www.wexue.top/auth/authUser?state=require&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
+                Button gongkai = new Button("公开课", webUrl+"/auth/authUser?state=public&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
+                Button bixiu = new Button("必修课", webUrl+"/auth/authUser?state=require&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
                 //buttons.add(xueyuan);
                 buttons.add(gongkai);
                 buttons.add(bixiu);
@@ -97,7 +104,7 @@ public class WpxAPI {
                 msg = msg + agentItem.getAppId() + ":" + jsonResult.getDesc() + ";";
                 //设置信息
                 AgentSetter agentSetter = new AgentSetter(agentItem.getAgentId());
-                agentSetter.setRedirectDomain("www.wexue.top");
+                agentSetter.setRedirectDomain(redirectDomain);
                 agentSetter.setReportEnter(true);
                 agentSetter.setReportUser(true);
                 suiteApi.setAgent(authCorid, agentSetter);
@@ -105,7 +112,7 @@ public class WpxAPI {
             if (agentItem.getAppId() == 2) {
                 List<Button> buttons = new ArrayList<Button>();
                 Button xueyuan = new Button("课程签到", "scancode_push", ButtonType.scancode_push);
-                Button gongkai = new Button("我的课程", "http://www.wexue.top/auth/authUser?state=mycourse&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
+                Button gongkai = new Button("我的课程", webUrl+"/auth/authUser?state=mycourse&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
 //               Button bixiu = new Button("我的必修课", "http://www.wexue.top/auth/authUser?state=myrequired&corpId="+oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
                 buttons.add(xueyuan);
                 buttons.add(gongkai);
@@ -115,7 +122,7 @@ public class WpxAPI {
 
                 //设置信息
                 AgentSetter agentSetter = new AgentSetter(agentItem.getAgentId());
-                agentSetter.setRedirectDomain("www.wexue.top");
+                agentSetter.setRedirectDomain(redirectDomain);
                 agentSetter.setReportEnter(true);
                 agentSetter.setReportUser(true);
                 suiteApi.setAgent(authCorid, agentSetter);

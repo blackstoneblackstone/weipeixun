@@ -10,6 +10,12 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:applicationContext.xml</param-value>
     </context-param>
+
+    <!-- Spring 刷新Introspector防止内存泄露 -->
+    <listener>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+
     <!-- Spring 监听 -->
     <filter>
         <filter-name>encodingFilter</filter-name>
@@ -84,10 +90,10 @@
     <welcome-file-list>
         <welcome-file>/index.jsp</welcome-file>
     </welcome-file-list>
-    <error-page>
-        <error-code>500</error-code>
-        <location>/platform/error?type=500</location>
-    </error-page>
+    <!--<error-page>-->
+        <!--<error-code>500</error-code>-->
+        <!--<location>/platform/error?type=500</location>-->
+    <!--</error-page>-->
     <error-page>
         <error-code>403</error-code>
         <location>/platform/error?type=403</location>

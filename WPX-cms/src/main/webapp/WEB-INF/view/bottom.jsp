@@ -17,7 +17,7 @@
 <div id="footer" class="center">
     <div> 2013 &copy; Copyright 微学</div>
 </div>
-<script src="/js/platform.js"></script>
+<script src="<%=basePath%>/js/platform.js"></script>
 <script>
     if($("body").height()< $(window).height()){
         $("#footer").addClass("footer");

@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.foxinmy.weixin4j.exception.WeixinException;
-import com.foxinmy.weixin4j.http.weixin.JsonResult;
+import com.foxinmy.weixin4j.http.weixin.ApiResult;
 import com.foxinmy.weixin4j.model.Button;
 import com.foxinmy.weixin4j.qy.api.MenuApi;
 import com.foxinmy.weixin4j.type.ButtonType;
@@ -17,9 +17,9 @@ import com.foxinmy.weixin4j.type.ButtonType;
  * 自定义菜单测试
  * 
  * @className MenuTest
- * @author jy.hu
+ * @author jinyu(foxinmy@gmail.com)
  * @date 2014年4月10日
- * @since JDK 1.7
+ * @since JDK 1.6
  */
 public class MenuTest extends TokenTest {
 
@@ -28,7 +28,7 @@ public class MenuTest extends TokenTest {
 
 	@Before
 	public void init() {
-		menuApi = new MenuApi(tokenHolder);
+		menuApi = new MenuApi(tokenManager);
 	}
 
 	@Test
@@ -42,13 +42,13 @@ public class MenuTest extends TokenTest {
 		btnList.add(b);
 		b = new Button("photo", "photo", ButtonType.pic_photo_or_album);
 		btnList.add(b);
-		JsonResult result = menuApi.createMenu(btnList, 1);
-		Assert.assertEquals(0, result.getCode());
+		ApiResult result = menuApi.createMenu(1, btnList);
+		Assert.assertEquals("0", result.getReturnCode());
 	}
 
 	@Test
 	public void get() throws WeixinException {
-		btnList = menuApi.getMenu(1);
+		btnList = menuApi.getMenu(0);
 		for (Button btn : btnList) {
 			System.out.println(btn);
 		}
@@ -57,7 +57,7 @@ public class MenuTest extends TokenTest {
 
 	@Test
 	public void delete() throws WeixinException {
-		JsonResult result = menuApi.deleteMenu(1);
-		Assert.assertEquals(0, result.getCode());
+		ApiResult result = menuApi.deleteMenu(1);
+		Assert.assertEquals("0", result.getReturnCode());
 	}
 }

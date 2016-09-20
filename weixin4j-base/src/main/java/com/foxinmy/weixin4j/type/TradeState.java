@@ -4,9 +4,9 @@ package com.foxinmy.weixin4j.type;
  * 交易状态
  * 
  * @className TradeState
- * @author jy
+ * @author jinyu(foxinmy@gmail.com)
  * @date 2014年11月2日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public enum TradeState {

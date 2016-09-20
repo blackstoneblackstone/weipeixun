@@ -1,14 +1,12 @@
 package com.foxinmy.weixin4j.qy.test;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import com.alibaba.fastjson.JSONObject;
 import com.foxinmy.weixin4j.exception.WeixinException;
 import com.foxinmy.weixin4j.qy.api.NotifyApi;
 import com.foxinmy.weixin4j.qy.message.NotifyMessage;
+import com.foxinmy.weixin4j.qy.model.IdParameter;
 import com.foxinmy.weixin4j.tuple.File;
 import com.foxinmy.weixin4j.tuple.Image;
 import com.foxinmy.weixin4j.tuple.MpNews;
@@ -21,9 +19,9 @@ import com.foxinmy.weixin4j.tuple.Voice;
  * 客服消息测试
  * 
  * @className NotifyTest
- * @author jy.hu
+ * @author jinyu(foxinmy@gmail.com)
  * @date 2014年4月10日
- * @since JDK 1.7
+ * @since JDK 1.6
  * @see
  */
 public class NotifyTest extends TokenTest {
@@ -32,12 +30,12 @@ public class NotifyTest extends TokenTest {
 
 	@Before
 	public void init() {
-		notifyApi = new NotifyApi(tokenHolder);
+		notifyApi = new NotifyApi(tokenManager);
 	}
 
 	@Test
 	public void text() throws WeixinException {
-		NotifyMessage notify = new NotifyMessage(64, new Text("您有新的课程"));
+		NotifyMessage notify = new NotifyMessage(40, new Text("content"));
 		System.out.println(notifyApi.sendNotifyMessage(notify));
 	}
 
@@ -71,8 +69,8 @@ public class NotifyTest extends TokenTest {
 	public void news() throws WeixinException {
 		News news = new News();
 		NotifyMessage notify = new NotifyMessage(0, news);
-		news.addArticle("课程通知", "您有新的课程\n\n\n名称：<a href=http://www.baidu.com style=color:red>成功人士的10000个习惯</a>\n时间：2015-10-10\n地点：公司c1会议室\n讲师：李老师", "", "http://www.wexue.top");
-		//news.addArticle("title2", "desc2", "picUrl2", "url2");
+		news.addArticle("title1", "desc1", "picUrl1", "url1");
+		news.addArticle("title2", "desc2", "picUrl2", "url2");
 		System.out.println(notifyApi.sendNotifyMessage(notify));
 	}
 
@@ -88,8 +86,8 @@ public class NotifyTest extends TokenTest {
 	@Test
 	public void send1() throws WeixinException {
 		Text text = new Text("this is a text");
-		JSONObject result = notifyApi.sendNotifyMessage(new NotifyMessage(2,
+		IdParameter result = notifyApi.sendNotifyMessage(new NotifyMessage(1,
 				text));
-		Assert.assertEquals(0, result.getIntValue("errcode"));
+		System.err.println(result);
 	}
 }

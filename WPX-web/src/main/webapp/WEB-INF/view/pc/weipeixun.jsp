@@ -41,7 +41,7 @@
             <li class="active"><a href="/">首页</a></li>
             <li><a href="<%=basePath%>/app/weipeixun">应用中心</a></li>
             <%--<li><a href="http://www.wexue.top:8080/WPX-cms/registJsp" class="kt">免费开通</a></li>--%>
-            <li class="login" style="margin-left:10px"><a href="http://www.wexue.top:8080/WPX-cms/" target="_blank"
+            <li class="login" style="margin-left:10px"><a href="http://www.wexue.top:8080/" target="_blank"
                                                           rel="nofollow">管理平台</a>
             </li>
         </ul>

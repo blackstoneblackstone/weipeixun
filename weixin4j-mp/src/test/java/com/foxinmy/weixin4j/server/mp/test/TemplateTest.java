@@ -1,0 +1,45 @@
+package com.foxinmy.weixin4j.server.mp.test;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.foxinmy.weixin4j.exception.WeixinException;
+import com.foxinmy.weixin4j.http.weixin.JsonResult;
+import com.foxinmy.weixin4j.server.mp.api.TmplApi;
+import com.foxinmy.weixin4j.server.mp.message.TemplateMessage;
+import com.foxinmy.weixin4j.server.mp.type.IndustryType;
+
+public class TemplateTest extends TokenTest {
+	private TmplApi tmplApi;
+
+	@Before
+	public void init() {
+		this.tmplApi = new TmplApi(tokenHolder);
+	}
+
+	@Test
+	public void setIndustry() throws WeixinException {
+		System.out.println(tmplApi
+				.setTmplIndustry(IndustryType.ITKEJI_DIANZIJISHU));
+	}
+
+	@Test
+	public void getId() throws WeixinException {
+		System.out.println(tmplApi.getTemplateId("OPENTM201490080"));
+	}
+
+	@Test
+	public void getAll() throws WeixinException {
+		System.out.println(tmplApi.getAllTemplates());
+	}
+
+	@Test
+	public void test() throws WeixinException {
+		TemplateMessage tplMessage = new TemplateMessage("touser",
+				"template_id", "title", "url");
+		tplMessage.pushHead("head").pushTail("tail").pushItem("key1", "text1");
+		JsonResult result = tmplApi.sendTmplMessage(tplMessage);
+		Assert.assertEquals(0, result.getCode());
+	}
+}

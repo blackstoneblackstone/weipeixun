@@ -6,20 +6,20 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.foxinmy.weixin4j.exception.WeixinException;
-import com.foxinmy.weixin4j.http.weixin.JsonResult;
+import com.foxinmy.weixin4j.http.weixin.ApiResult;
 import com.foxinmy.weixin4j.http.weixin.WeixinResponse;
 import com.foxinmy.weixin4j.model.Token;
 import com.foxinmy.weixin4j.qy.model.Contacts;
 import com.foxinmy.weixin4j.qy.model.IdParameter;
 import com.foxinmy.weixin4j.qy.model.Tag;
 import com.foxinmy.weixin4j.qy.model.User;
-import com.foxinmy.weixin4j.token.TokenHolder;
+import com.foxinmy.weixin4j.token.TokenManager;
 
 /**
  * 标签API
  * 
  * @className TagApi
- * @author jy
+ * @author jinyu(foxinmy@gmail.com)
  * @date 2014年11月19日
  * @since JDK 1.6
  * @see <a href=
@@ -27,10 +27,10 @@ import com.foxinmy.weixin4j.token.TokenHolder;
  *      管理标签</a>
  */
 public class TagApi extends QyApi {
-	private final TokenHolder tokenHolder;
+	private final TokenManager tokenManager;
 
-	public TagApi(TokenHolder tokenHolder) {
-		this.tokenHolder = tokenHolder;
+	public TagApi(TokenManager tokenManager) {
+		this.tokenManager = tokenManager;
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class TagApi extends QyApi {
 	 */
 	public int createTag(Tag tag) throws WeixinException {
 		String tag_create_uri = getRequestUri("tag_create_uri");
-		Token token = tokenHolder.getToken();
+		Token token = tokenManager.getCache();
 		JSONObject obj = (JSONObject) JSON.toJSON(tag);
 		if (obj.getIntValue("tagid") <= 0) {
 			obj.remove("tagid");
@@ -70,13 +70,13 @@ public class TagApi extends QyApi {
 	 * @see com.foxinmy.weixin4j.qy.model.Tag
 	 * @throws WeixinException
 	 */
-	public JsonResult updateTag(Tag tag) throws WeixinException {
+	public ApiResult updateTag(Tag tag) throws WeixinException {
 		String tag_update_uri = getRequestUri("tag_update_uri");
-		Token token = tokenHolder.getToken();
+		Token token = tokenManager.getCache();
 		WeixinResponse response = weixinExecutor.post(
 				String.format(tag_update_uri, token.getAccessToken()),
 				JSON.toJSONString(tag));
-		return response.getAsJsonResult();
+		return response.getAsResult();
 	}
 
 	/**
@@ -90,12 +90,12 @@ public class TagApi extends QyApi {
 	 *      删除标签说明</a>
 	 * @throws WeixinException
 	 */
-	public JsonResult deleteTag(int tagId) throws WeixinException {
+	public ApiResult deleteTag(int tagId) throws WeixinException {
 		String tag_delete_uri = getRequestUri("tag_delete_uri");
-		Token token = tokenHolder.getToken();
+		Token token = tokenManager.getCache();
 		WeixinResponse response = weixinExecutor.get(String.format(
 				tag_delete_uri, token.getAccessToken(), tagId));
-		return response.getAsJsonResult();
+		return response.getAsResult();
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class TagApi extends QyApi {
 	 */
 	public List<Tag> listTag() throws WeixinException {
 		String tag_list_uri = getRequestUri("tag_list_uri");
-		Token token = tokenHolder.getToken();
+		Token token = tokenManager.getCache();
 		WeixinResponse response = weixinExecutor.get(String.format(
 				tag_list_uri, token.getAccessToken()));
 		return JSON.parseArray(response.getAsJson().getString("taglist"),
@@ -133,7 +133,7 @@ public class TagApi extends QyApi {
 	 */
 	public Contacts getTagUsers(int tagId) throws WeixinException {
 		String tag_get_user_uri = getRequestUri("tag_get_user_uri");
-		Token token = tokenHolder.getToken();
+		Token token = tokenManager.getCache();
 		WeixinResponse response = weixinExecutor.get(String.format(
 				tag_get_user_uri, token.getAccessToken(), tagId));
 		JSONObject obj = response.getAsJson();
@@ -146,8 +146,7 @@ public class TagApi extends QyApi {
 	}
 
 	/**
-	 * 新增标签成员(标签对管理组可见且未加锁，成员属于管理组管辖范围。)<br>
-	 * <font color="red">若部分userid或partyid非法，则在text中体现</font>
+	 * 新增标签成员(标签对管理组可见且未加锁，成员属于管理组管辖范围。)
 	 * 
 	 * @param tagId
 	 *            标签ID
@@ -159,7 +158,7 @@ public class TagApi extends QyApi {
 	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%A0%87%E7%AD%BE#.E5.A2.9E.E5.8A.A0.E6.A0.87.E7.AD.BE.E6.88.90.E5.91.98">
 	 *      新增标签成员说明</a>
 	 * @see com.foxinmy.weixin4j.qy.model.IdParameter
-	 * @return 处理结果
+	 * @return 非法的userIds和partyIds
 	 * @throws WeixinException
 	 */
 	public IdParameter addTagUsers(int tagId, List<String> userIds,
@@ -170,7 +169,6 @@ public class TagApi extends QyApi {
 
 	/**
 	 * 删除标签成员(标签对管理组未加锁，成员属于管理组管辖范围)<br>
-	 * <font color="red">若部分userid或partyid非法，则在text中体现</font>
 	 * 
 	 * @param tagId
 	 *            标签ID
@@ -182,7 +180,7 @@ public class TagApi extends QyApi {
 	 *      "http://qydev.weixin.qq.com/wiki/index.php?title=%E7%AE%A1%E7%90%86%E6%A0%87%E7%AD%BE#.E5.88.A0.E9.99.A4.E6.A0.87.E7.AD.BE.E6.88.90.E5.91.98">
 	 *      删除标签成员说明</a>
 	 * @see com.foxinmy.weixin4j.qy.model.IdParameter
-	 * @return 处理结果
+	 * @return 非法的userIds和partyIds
 	 * @throws WeixinException
 	 */
 	public IdParameter deleteTagUsers(int tagId, List<String> userIds,
@@ -198,7 +196,7 @@ public class TagApi extends QyApi {
 		obj.put("tagid", tagId);
 		obj.put("userlist", userIds);
 		obj.put("partylist", partyIds);
-		Token token = tokenHolder.getToken();
+		Token token = tokenManager.getCache();
 		WeixinResponse response = weixinExecutor.post(
 				String.format(uri, token.getAccessToken()), obj.toJSONString());
 		obj = response.getAsJson();

@@ -2,6 +2,7 @@
          pageEncoding="UTF-8" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <%
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
@@ -15,51 +16,72 @@
 <link rel="stylesheet" href="<%=basePath%>/lib/bootstrap-3.3.5-dist/css/green.css"/>
 <script src="<%=basePath%>/lib/bootstrap-3.3.5-dist/js/icheck.min.js"></script>
 <div class="content">
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            通讯录
-            <span>
-                <c:if test="${pTask=='1'}">
-                    <label class="label label-danger">任务状态:</label>部门同步任务开始
-                </c:if>
-                <c:if test="${pTask=='2'}">
-                    <label class="label label-danger">任务状态:</label>部门同步任务进行中
-                </c:if>
-                <c:if test="${pTask=='3'}">
-                    <label class="label label-danger">任务状态:</label> 部门同步任务已完成
-                </c:if>
-                 <c:if test="${pTask!='1'&&pTask!='2'&&pTask!='3'}">
-                     <label class="label label-danger">任务状态:</label>部门同步错误：${pTask}
-                 </c:if>
-                <c:if test="${uTask=='1'}">
-                    :成员同步任务开始
-                </c:if>
-                <c:if test="${uTask=='2'}">
-                    :成员同步任务进行中
-                </c:if>
-                <c:if test="${uTask=='3'}">
-                    :成员同步任务已完成
-                </c:if>
-                <c:if test="${uTask!='1'&&uTask!='2'&&uTask!='3'}">
-                    :成员同步错误：${uTask}
-                </c:if>
-            </span>
-            <%--<c:if test="${pTask=='3'&&uTask=='3'}">--%>
-                <button class="right btn btn-warning btn-xs" onclick="syncAddressboolToWechat()"><i
-                        class="glyphicon glyphicon-arrow-up"></i>同步到微信
+    <div class="col-sm-1 shu">
+        <a href="<%=basePath%>/platform/speaker">
+            <div>讲师库</div>
+        </a>
+        <a href="<%=basePath%>/platform/addressbook">
+            <div class="active">通讯录</div>
+        </a>
+    </div>
+    <!--Action boxes-->
+    <div class="col-sm-11">
+        <div class="row">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-success" data-loading-text="同步中..." onclick="syncLocation(this)">
+                    <i class="glyphicon glyphicon-download"></i> 同步到本地
                 </button>
-            <%--</c:if>--%>
-
-            <%--<button class="right btn btn-success btn-xs"><i class="glyphicon glyphicon-arrow-down"></i>同步到本地</button>--%>
+                <span id="info">
+                上次更新时间：${createtime}  ${task.state}</span>
+                <hr>
+            </div>
         </div>
-        <div class="panel-body">
+        <%--<div class="panel panel-info">--%>
+        <%--<div class="panel-heading">--%>
+        <%--通讯录--%>
+        <%--<span>--%>
+        <%--<c:if test="${pTask=='1'}">--%>
+        <%--<label class="label label-danger">任务状态:</label>部门同步任务开始--%>
+        <%--</c:if>--%>
+        <%--<c:if test="${pTask=='2'}">--%>
+        <%--<label class="label label-danger">任务状态:</label>部门同步任务进行中--%>
+        <%--</c:if>--%>
+        <%--<c:if test="${pTask=='3'}">--%>
+        <%--<label class="label label-danger">任务状态:</label> 部门同步任务已完成--%>
+        <%--</c:if>--%>
+        <%--<c:if test="${pTask!='1'&&pTask!='2'&&pTask!='3'}">--%>
+        <%--<label class="label label-danger">任务状态:</label>部门同步错误：${pTask}--%>
+        <%--</c:if>--%>
+        <%--<c:if test="${uTask=='1'}">--%>
+        <%--:成员同步任务开始--%>
+        <%--</c:if>--%>
+        <%--<c:if test="${uTask=='2'}">--%>
+        <%--:成员同步任务进行中--%>
+        <%--</c:if>--%>
+        <%--<c:if test="${uTask=='3'}">--%>
+        <%--:成员同步任务已完成--%>
+        <%--</c:if>--%>
+        <%--<c:if test="${uTask!='1'&&uTask!='2'&&uTask!='3'}">--%>
+        <%--:成员同步错误：${uTask}--%>
+        <%--</c:if>--%>
+        <%--</span>--%>
+        <%--&lt;%&ndash;<c:if test="${pTask=='3'&&uTask=='3'}">&ndash;%&gt;--%>
+        <%--&lt;%&ndash;<button class="right btn btn-warning btn-xs" onclick="syncAddressboolToWechat()"><i&ndash;%&gt;--%>
+        <%--&lt;%&ndash;class="glyphicon glyphicon-arrow-up"></i>同步到微信&ndash;%&gt;--%>
+        <%--&lt;%&ndash;</button>&ndash;%&gt;--%>
+        <%--&lt;%&ndash;</c:if>&ndash;%&gt;--%>
+
+        <%--&lt;%&ndash;<button class="right btn btn-success btn-xs"><i class="glyphicon glyphicon-arrow-down"></i>同步到本地</button>&ndash;%&gt;--%>
+        <%--</div>--%>
+        <%--<div class="panel-body">--%>
+        <div class="row">
             <div class="col-sm-3">
                 <div class="panel panel-success">
                     <div class="panel-heading">
                         部门
-                        <button class="btn btn-xs btn-warning" href="<%=basePath%>/platform/addressbook/addDepJsp"
-                                data-toggle="modal" data-target="#Modal"><i class="glyphicon glyphicon-plus"></i>新增部门
-                        </button>
+                        <%--<button class="btn btn-xs btn-warning" href="<%=basePath%>/platform/addressbook/addDepJsp"--%>
+                        <%--data-toggle="modal" data-target="#Modal"><i class="glyphicon glyphicon-plus"></i>新增部门--%>
+                        <%--</button>--%>
                     </div>
                     <div class="panel-body">
                         <div id="departmentTree" class="ztree">
@@ -72,20 +94,20 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         员工
-                        <button class="btn btn-xs btn-warning" href="<%=basePath%>/platform/addressbook/addUserJsp"
-                                data-toggle="modal" data-target="#Modal"><i class="glyphicon glyphicon-plus"></i>新增成员
-                        </button>
+                        <%--<button class="btn btn-xs btn-warning" href="<%=basePath%>/platform/addressbook/addUserJsp"--%>
+                        <%--data-toggle="modal" data-target="#Modal"><i class="glyphicon glyphicon-plus"></i>新增成员--%>
+                        <%--</button>--%>
                     </div>
                     <div class="panel-body">
                         <table class="table table-hover">
                             <thead>
                             <th>姓名</th>
                             <th>账号</th>
-                            <th>职位</th>
+                            <%--<th>职位</th>--%>
                             <th>手机</th>
-                            <th>邮箱</th>
+                            <%--<th>邮箱</th>--%>
                             <th>状态</th>
-                            <th>操作</th>
+                            <%--<th>操作</th>--%>
                             </thead>
                             <tbody id="userContent" class="center">
 
@@ -96,12 +118,14 @@
             </div>
         </div>
     </div>
+    <%--</div>--%>
+    <%--</div>--%>
 </div>
 
 <script>
 
     $(function () {
-        $("#menu li:eq(7)").addClass("active");
+        $("#menu li:eq(5)").addClass("active");
         $('.icheck').iCheck({
             checkboxClass: 'icheckbox_square-green',
             radioClass: 'iradio_square-green',
@@ -145,19 +169,19 @@
                             "</td>" +
                             "<td>" + data[i].userid +
                             "</td>" +
-                            "<td>" + data[i].position +
-                            "</td>" +
+//                            "<td>" + data[i].position +
+//                            "</td>" +
                             "<td>" + data[i].mobile +
                             "</td>" +
-                            "<td>" + data[i].email +
-                            "</td>" +
+//                            "<td>" + data[i].email +
+//                            "</td>" +
                             "<td>" + data[i].status +
                             "</td>" +
-                            "<td>" +
-                            "<button class='btn btn-xs btn-success' href='<%=basePath%>/platform/addressbook/editJsp?id=" + data[i].userid +
-                            "' data-toggle='modal' data-target='#Modal'>编辑</button>" +
-                            "<button class='delete btn btn-xs btn-danger' data-id='" + data[i].userid + "' data-loading-text='删除中...'>删除</button>" +
-                            "</td>" +
+                            <%--"<td>" +--%>
+                            <%--&lt;%&ndash;"<button class='btn btn-xs btn-success' href='<%=basePath%>/platform/addressbook/editJsp?id=" + data[i].userid +&ndash;%&gt;--%>
+                            <%--&lt;%&ndash;"' data-toggle='modal' data-target='#Modal'>编辑</button>" +&ndash;%&gt;--%>
+                            <%--&lt;%&ndash;"<button class='delete btn btn-xs btn-danger' data-id='" + data[i].userid + "' data-loading-text='删除中...'>删除</button>" +&ndash;%&gt;--%>
+                            <%--"</td>" +--%>
                             "</tr>";
                         }
                         $("#userContent").html(table);
@@ -206,11 +230,13 @@
     });
 
 
-    function syncAddressboolToWechat() {
+    function syncAddressboolToWechat(e) {
+        var $btn = $(e).button('loading');
         $.ajax({
             url: "<%=basePath%>/platform/addressbook/syncUsersToWechat",
             type: "get",
             success: function (data) {
+                $btn.button('reset');
                 if (data.success) {
                     showTip(data.msg, "success");
                 } else {
@@ -219,6 +245,26 @@
             }
         });
     }
+
+    //微信通讯录同步到本地
+    function syncLocation(e) {
+        var $btn = $(e).button('loading');
+        $.ajax({
+            url: "<%=basePath%>/platform/addressbook/syncLocation",
+            type: "get",
+            success: function (data) {
+                $btn.button('reset');
+                $("#info").html(data.msg);
+                if (data.success) {
+                    showTip(data.msg, "success");
+                } else {
+                    showTip(data.msg, "failure");
+                }
+            }
+        });
+    }
+
+
 </script>
 
 <!--bottom-->

@@ -1,8 +1,6 @@
 package top.wexue.user.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.foxinmy.weixin4j.exception.WeixinException;
-import com.foxinmy.weixin4j.qy.message.ChatMessage;
 import com.foxinmy.weixin4j.qy.message.NotifyMessage;
 import com.foxinmy.weixin4j.qy.model.ChatInfo;
 import com.foxinmy.weixin4j.qy.model.IdParameter;
@@ -16,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.wexue.common.model.Result;
 import top.wexue.common.service.WeixinAPI;
-import top.wexue.dao.*;
-import top.wexue.model.Page;
+import top.wexue.base.dao.*;
+import top.wexue.base.model.Page;
 import top.wexue.user.utils.WebUtils;
-import top.wexue.utils.BaseMethod;
-import top.wexue.utils.Constants;
-import top.wexue.model.Course;
-import top.wexue.model.SessionInfo;
+import top.wexue.base.utils.BaseMethod;
+import top.wexue.base.utils.Constants;
+import top.wexue.base.model.Course;
+import top.wexue.common.model.SessionInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +52,6 @@ public class CourseController {
     private ResearchCourseDao researchCourseDao;
     @Autowired
     private AuthInfoDAO authInfoDAO;
-    @Autowired
     private WeixinAPI weixinAPI;
 
     @RequestMapping(value = "", method = RequestMethod.GET)

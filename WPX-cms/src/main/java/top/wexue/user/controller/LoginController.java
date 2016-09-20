@@ -1,22 +1,24 @@
 package top.wexue.user.controller;
 
+import com.foxinmy.weixin4j.cache.RedisCacheStorager;
 import com.foxinmy.weixin4j.exception.WeixinException;
-import com.foxinmy.weixin4j.qy.model.OUserInfo;
+import com.foxinmy.weixin4j.model.Token;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.wexue.common.model.Result;
+import top.wexue.base.dao.AuthCorpInfoDAO;
+import top.wexue.base.utils.BaseMethod;
+import top.wexue.base.utils.Constants;
 import top.wexue.common.service.WeixinAPI;
-import top.wexue.dao.AuthCorpInfoDAO;
-import top.wexue.utils.BaseMethod;
-import top.wexue.utils.Constants;
 import top.wexue.user.utils.IpUtil;
-import top.wexue.utils.MD5Util;
-import top.wexue.dao.LoginUserDao;
-import top.wexue.model.SessionInfo;
+import top.wexue.base.utils.MD5Util;
+import top.wexue.base.dao.LoginUserDao;
+import top.wexue.common.model.SessionInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +26,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Date;
 import java.util.Map;
 
 
@@ -37,12 +38,31 @@ import java.util.Map;
 
 @Controller
 public class LoginController {
+
+
+    /**
+     * 微信配置
+     */
+    @Value("${weixinConfig.suit_id}")
+    private String SUIT_ID;
+    @Value("${weixinConfig.suit_secret}")
+    private String SUIT_SECRET;
+    @Value("${weixinConfig.chat_id}")
+    private String CHAT_ID;
+    @Value("${weixinConfig.chat_secret}")
+    private String CHAT_SECRET;
+    @Value("${weixinConfig.corp_id}")
+    private String CORP_ID;
+    @Value("${weixinConfig.provider_secret}")
+    private String PROVIDER_SECRET;
+
+    @Autowired
+    RedisCacheStorager<Token> redisCacheStorager;
+
     @Autowired
     private LoginUserDao loginUserDao;
     @Autowired
     private AuthCorpInfoDAO authCorpInfoDao;
-    @Autowired
-    private WeixinAPI weixinAPI;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String welcomeJsp() {
@@ -66,22 +86,31 @@ public class LoginController {
     */
     @RequestMapping(value = "/qyauth", method = RequestMethod.GET)
     public String qyauth(String auth_code, HttpServletRequest request, HttpSession session, String state, String expires_in) {
-        try {
-            OUserInfo oUserInfo = weixinAPI.getOUserInfoByCode(auth_code);
-            SessionInfo sessionInfo = new SessionInfo();
-            sessionInfo.setIp(IpUtil.getIpAddr(request));
-            sessionInfo.setUsername(oUserInfo.getAdminInfo().getName());
-            sessionInfo.setId(String.valueOf(new Date().getTime()));
-            sessionInfo.setUserId(oUserInfo.getAdminInfo().getUserId());
-            sessionInfo.setCorpid(oUserInfo.getCorpInfo().getCorpId());
-            sessionInfo.setQyname(oUserInfo.getCorpInfo().getCorpName());
-            sessionInfo.setQyheader(oUserInfo.getCorpInfo().getRoundLogoUrl());
-            session.setAttribute(Constants.Config.SESSION_USER_NAME, sessionInfo);
-            //初始化
-            weixinAPI.initWeixinAPI(oUserInfo.getCorpInfo().getCorpId());
-        } catch (WeixinException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            OUserInfo oUserInfo = weixinAPI.getOUserInfoByCode(auth_code);
+        SessionInfo sessionInfo = new SessionInfo();
+
+//            sessionInfo.setIp(IpUtil.getIpAddr(request));
+//            sessionInfo.setUsername(oUserInfo.getAdminInfo().getName());
+//            sessionInfo.setId(String.valueOf(new Date().getTime()));
+//            sessionInfo.setUserId(oUserInfo.getAdminInfo().getUserId());
+//            sessionInfo.setCorpid(oUserInfo.getCorpInfo().getCorpId());
+//            sessionInfo.setQyname(oUserInfo.getCorpInfo().getCorpName());
+//            sessionInfo.setQyheader(oUserInfo.getCorpInfo().getRoundLogoUrl());
+//            WeixinAPI weixinAPI=new WeixinAPI(oUserInfo.getCorpInfo().getCorpId(),redisCacheStorager,SUIT_ID,SUIT_SECRET,CHAT_ID,CHAT_SECRET,CORP_ID,PROVIDER_SECRET);
+
+        //初始化各种API
+        WeixinAPI weixinAPI = new WeixinAPI("wxf54e1b5e0b62fa96", redisCacheStorager, SUIT_ID, SUIT_SECRET, CHAT_ID, CHAT_SECRET, CORP_ID, PROVIDER_SECRET);
+        sessionInfo.setWeixinApI(weixinAPI);
+        sessionInfo.setUserId("muzijun");
+        sessionInfo.setCorpid("wxf54e1b5e0b62fa96");
+        sessionInfo.setId(BaseMethod.createUUID("SE"));
+        session.setAttribute(Constants.Config.SESSION_USER_NAME, sessionInfo);
+
+//            weixinAPI.initWeixinAPI(oUserInfo.getCorpInfo().getCorpId());
+//        } catch (WeixinException e) {
+//            return "platform";
+//        }
         return "platform";
     }
 
@@ -110,8 +139,6 @@ public class LoginController {
                     sessionInfo.setQyname(corp.get("corp_name").toString());
                     sessionInfo.setQyheader(corp.get("corp_square_logo_url").toString());
                     session.setAttribute(Constants.Config.SESSION_USER_NAME, sessionInfo);
-                    //初始化
-                    weixinAPI.initWeixinAPI(user.get("corpid").toString());
                     result.setObj(sessionInfo);
                     result.setSuccess(true);
                     result.setMsg(Constants.Message.LOGIN_SUCCESS);

@@ -3,26 +3,34 @@ package top.wexue.user.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.foxinmy.weixin4j.exception.WeixinException;
-import com.foxinmy.weixin4j.qy.model.BatchResult;
-import com.foxinmy.weixin4j.qy.model.Callback;
 import com.foxinmy.weixin4j.qy.model.Party;
+import com.foxinmy.weixin4j.qy.type.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import top.wexue.base.dao.AuthUserDao;
+import top.wexue.base.dao.DepartmentUserDao;
+import top.wexue.base.dao.PartyDao;
+import top.wexue.base.entity.TDepartment;
+import top.wexue.base.entity.TTask;
+import top.wexue.base.entity.TUser;
+import top.wexue.common.model.SessionInfo;
+import top.wexue.base.model.User;
+import top.wexue.base.repository.DepartmentRepository;
+import top.wexue.base.repository.TaskRepository;
+import top.wexue.base.repository.UserRepository;
+import top.wexue.base.utils.BaseMethod;
+import top.wexue.base.utils.Constants;
 import top.wexue.common.model.Result;
+import top.wexue.common.model.TaskType;
 import top.wexue.common.service.WeixinAPI;
-import top.wexue.dao.AuthUserDao;
-import top.wexue.dao.DepartmentUserDao;
-import top.wexue.dao.PartyDao;
-import top.wexue.dao.TaskDao;
-import top.wexue.model.Page;
-import top.wexue.model.SessionInfo;
-import top.wexue.model.User;
-import top.wexue.utils.BaseMethod;
-import top.wexue.utils.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,12 +48,10 @@ import java.util.Map;
  * @Description 个人信息控制器（登陆）
  * @date 2014-1-8 下午3:36:28
  */
-
 @Controller
 @RequestMapping("/platform/addressbook")
 public class AddressBookController {
 
-    @Autowired
     private WeixinAPI weixinAPI;
     @Autowired
     private PartyDao partyDao;
@@ -53,8 +59,19 @@ public class AddressBookController {
     private AuthUserDao authUserDao;
     @Autowired
     private DepartmentUserDao departmentUserDao;
+
     @Autowired
-    private TaskDao taskDao;
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    @Value("#{weixinConfig.suite_id}")
+    private String SUIT_ID;
 
     @RequestMapping(value = "/tree", method = RequestMethod.GET)
     public String getUserByPartId(HttpSession session) {
@@ -63,7 +80,7 @@ public class AddressBookController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public String addressBook(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+    public String addressBook(SessionInfo sessionInfo, HttpServletRequest request, HttpServletResponse response) {
 //        try {
 //            BatchResult p = weixinAPI.getBatchResult("EbvUl017_-Z0ehEC1TWp2QSNfRMVBuf1--_Gq3A5ebM");
 //            request.setAttribute("pTask", p.getStatus());
@@ -76,16 +93,19 @@ public class AddressBookController {
 //        } catch (WeixinException eu) {
 //            request.setAttribute("uTask", eu.getLocalizedMessage());
 //        }
-        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
-        String rUrl = "error404";
-        try {
-            String url = weixinAPI.loginAddressBook(sessionInfo.getCorpid());
-            request.setAttribute("url", url);
-            rUrl = "wechatPage";
-        } catch (WeixinException e) {
-            e.printStackTrace();
+//        try {
+//            String url = weixinAPI.loginAddressBook(sessionInfo.getCorpid());
+//            request.setAttribute("url", url);
+//        } catch (WeixinException e) {
+//        }
+        Page tTask = taskRepository.findByUserid(sessionInfo.getUserId(),new PageRequest(1, 1, new Sort(Sort.Direction.DESC, "createtime")));
+        if (tTask != null && tTask.getSize() != 0) {
+            request.setAttribute("task", tTask.iterator().next());
+            request.setAttribute("createtime", BaseMethod.dateFormat(((TTask) (tTask.iterator().next())).getCreatetime()));
+        } else {
+            request.setAttribute("task", "还未更新过");
         }
-        return rUrl;
+        return "/addressbook/show";
     }
 
     /**
@@ -96,7 +116,7 @@ public class AddressBookController {
      */
     @ResponseBody
     @RequestMapping(value = "/getUserByPartId", method = RequestMethod.GET)
-    public List<Map<String, Object>> getUserByPartId(String partyId, Page page, HttpSession session) {
+    public List<Map<String, Object>> getUserByPartId(String partyId, top.wexue.base.model.Page page, HttpSession session) {
         SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
         return authUserDao.getUserByPartyId(partyId, page, sessionInfo.getCorpid());
     }
@@ -192,7 +212,7 @@ public class AddressBookController {
 
     @RequestMapping(value = "/userDelete", method = RequestMethod.GET)
     @ResponseBody
-    public Result userDelete(String depId, String userid, HttpSession session) {
+    public Result userDelete(Integer depId, String userid, HttpSession session) {
         SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
         Result result = new Result();
         int i = authUserDao.delete(userid);
@@ -244,10 +264,10 @@ public class AddressBookController {
             if (BaseMethod.notEmpty(depIds)) {
                 String[] deps = depIds.split(",");
                 for (String dep : deps) {
-                    departmentUserDao.save(dep, user.getUserid(), sessionInfo.getCorpid());
+                    departmentUserDao.save(Integer.valueOf(dep), user.getUserid(), sessionInfo.getCorpid());
                 }
             } else {
-                departmentUserDao.save("1", user.getUserid(), sessionInfo.getCorpid());
+                departmentUserDao.save(1, user.getUserid(), sessionInfo.getCorpid());
             }
             result.setSuccess(true);
             result.setMsg("添加成功");
@@ -298,10 +318,10 @@ public class AddressBookController {
             if (BaseMethod.notEmpty(depIds)) {
                 String[] deps = depIds.split(",");
                 for (String dep : deps) {
-                    departmentUserDao.save(dep, user.getUserid(), sessionInfo.getCorpid());
+                    departmentUserDao.save(Integer.valueOf(dep), user.getUserid(), sessionInfo.getCorpid());
                 }
             } else {
-                departmentUserDao.save("1", user.getUserid(), sessionInfo.getCorpid());
+                departmentUserDao.save(1, user.getUserid(), sessionInfo.getCorpid());
             }
             result.setSuccess(true);
             result.setMsg("添加成功");
@@ -365,11 +385,69 @@ public class AddressBookController {
         return result;
     }
 
-    @RequestMapping(value = "/syncUsersLocation", method = RequestMethod.GET)
+    /**
+     * 同步
+     *
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "/syncLocation", method = RequestMethod.GET)
     @ResponseBody
-    public Result syncUsersLocation(String userId) {
+    public Result syncPartyLocation(HttpSession session) {
         Result result = new Result();
+        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+        int useri = 0;
+        try {
+            List<Party> parties = weixinAPI.listParty(0);
+            for (Party party : parties) {
+                TDepartment td = new TDepartment();
+                td.setCorpid(sessionInfo.getCorpid());
+                td.setDepartmentid(party.getId());
+                td.setId(BaseMethod.createUUID("DP"));
+                td.setDepartmentname(party.getName());
+                td.setOrderby(party.getOrder());
+                td.setSuiteid(SUIT_ID);
+                td.setParentid(party.getParentId());
+                departmentRepository.saveAndFlush(td);
+            }
+            List<com.foxinmy.weixin4j.qy.model.User> users = weixinAPI.listUser(1, true, UserStatus.BOTH, true);
+            for (com.foxinmy.weixin4j.qy.model.User user : users) {
+                TUser tUser = new TUser();
+                tUser.setCorpid(sessionInfo.getCorpid());
+                tUser.setAvatar(user.getAvatar());
+                tUser.setCreatetime(BaseMethod.getCurrentTime());
+                tUser.setSyntime(BaseMethod.getCurrentTime());
+                tUser.setUpdatetime(BaseMethod.getCurrentTime());
+                tUser.setEmail(user.getEmail());
+                tUser.setGender(user.getGender());
+                tUser.setMobile(user.getMobile());
+                tUser.setPosition(user.getPosition());
+                tUser.setStatus(user.getStatus());
+                tUser.setUsername(user.getName());
+                tUser.setWeixinid(user.getWeixinId());
+                tUser.setUserid(user.getUserId());
+                for (Integer id : user.getPartyIds()) {
+                    departmentUserDao.update(id, user.getUserId(), sessionInfo.getCorpid());
+                }
+                userRepository.saveAndFlush(tUser);
+                useri++;
+            }
+            TTask tTask = new TTask();
+            tTask.setCorpid(sessionInfo.getCorpid());
+            tTask.setUserid(sessionInfo.getUserId());
+            tTask.setCreatetime(BaseMethod.getCurrentTime());
+            tTask.setState("更新部门:" + parties.size() + ";更新用户:" + useri);
+            tTask.setType(TaskType.SYNCLOCATION.name());
+            taskRepository.save(tTask);
+            result.setSuccess(true);
+            result.setMsg("上次更新时间：" + BaseMethod.dateFormat(tTask.getCreatetime()) + "  更新部门:" + parties.size() + ";更新用户:" + useri);
 
+        } catch (Exception e) {
+            result.setSuccess(false);
+            result.setMsg(e.getMessage());
+        }
         return result;
     }
+
+
 }

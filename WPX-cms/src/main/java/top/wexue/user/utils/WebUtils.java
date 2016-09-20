@@ -1,7 +1,7 @@
 package top.wexue.user.utils;
 
 import com.foxinmy.weixin4j.qy.model.User;
-import top.wexue.model.SessionInfo;
+import top.wexue.common.model.SessionInfo;
 
 import javax.servlet.http.HttpServletRequest;
 

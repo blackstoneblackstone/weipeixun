@@ -6,124 +6,173 @@
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
 %>
-<!--header-->
-<jsp:include page="../header.jsp"></jsp:include>
-<!--header-->
-
-<!--menu-->
-<jsp:include page="../menu.jsp"></jsp:include>
-<%--<script src="<%=basePath%>/js/jquery.min.js"></script>--%>
-<%--<script src="<%=basePath%>/js/jquery.easyui.min.js"></script>--%>
-<%--<link rel="stylesheet" type="text/css" href="<%=basePath%>/css/easyui.css">--%>
-<!--menu-->
-<%--<link href="<%=basePath%>/css/admin_style.css" rel="stylesheet"/>--%>
-<!--content-->
-<div id="content">
-    <!--breadcrumbs-->
-    <div id="content-header">
-        <div id="breadcrumb"><a href="platform.jsp" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
-            <a href="<%=basePath%>/platform/project" title="Go to project" class="tip-bottom">Project</a>
-            <a href="#" title="Go to project" class="tip-bottom">Edit</a>
-        </div>
+<form action="<%=basePath%>/platform/course/add" method="post" class="form-horizontal">
+    <!--content-->
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">
+            编辑课程
+        </h4>
     </div>
-    <!--End-breadcrumbs-->
+    <div class="modal-body">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">ID :</label>
 
-    <!--Action boxes-->
-    <div class="container-fluid">
-        <div class="quick-actions_homepage">
-            <div class="widget-box">
-                <div class="widget-title"><span class="icon"> <i class="icon-align-justify"></i> </span>
-                    <h5>编辑项目</h5>
-                </div>
-                <div class="widget-content nopadding">
-                    <form action="<%=basePath%>/platform/project/edit" method="post" class="form-horizontal">
-                        <div class="control-group">
-                            <label class="control-label">ID :</label>
+            <div class="col-sm-8">
+                <input type="text" name="id" value="${course.id}" required class="form-control" style="display: none"/>
+                ${course.id}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">类型 :</label>
 
-                            <div class="controls">
-                                <input type="text" name="id" value="${project.id}" required class="span8" style="display: none"/>
-                                ${project.id}
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">项目名 :</label>
-
-                            <div class="controls">
-                                <input type="text" name="name" value="${project.proname}" required class="span8" placeholder="新员工入职培训等。。。"/>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">项目简介 :</label>
-
-                            <div class="controls">
-                                <textarea class="span8" name="desc"  required placeholder="这是干什么的，详细介绍下！">${project.prodesc}</textarea>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">起止时间 :</label>
-
-                            <div class="controls">
-                                <input name="starttime" value="${project.starttime}" type="text"  data-date-format="yyyy-mm-dd"
-                                       class="datepicker span3">到
-                                <input name="endtime" type="text" value="${project.endtime}"  data-date-format="yyyy-mm-dd"
-                                       class="datepicker span3">
-                                <span class="help-block">项目结束后，将关闭！</span></div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">负责人 :</label>
-
-                            <div class="controls">
-                                <select multiple name="fuzeren">
-                                    <c:forEach items="${project.leaders}" var="leader" varStatus="s">
-                                        <option value="${leader.userId}" selected="selected">${leader.name}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">参与人 :</label>
-
-                            <div class="controls">
-
-                                <%--<ul id="tt2" class="easyui-combotree" data-options="url:'<%=basePath%>/platform/addressbook/treejson',--%>
-                                <%--checkbox:true,--%>
-                                <%--method:'get',--%>
-                                <%--onClick: function(node){--%>
-                                <%--$(this).tree('toggle', node.target);--%>
-                                <%--},--%>
-                                <%--onContextMenu: function(e,node){--%>
-                                <%--e.preventDefault();--%>
-                                <%--$(this).tree('select',node.target);--%>
-                                <%--$('#mm').menu('show',{--%>
-                                <%--left: e.pageX,--%>
-                                <%--top: e.pageY--%>
-                                <%--});--%>
-                                <%--}"--%>
-                                <%--></ul>--%>
-
-                                <select multiple name="canyuren">
-                                    <c:forEach items="${project.users}" var="user" varStatus="s">
-                                        <option value="${user.userId}">${user.name}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-success">Save</button>
-                            </div>
-                        </div>
-                        <div class="control-group">
-
-                        </div>
-                    </form>
-                </div>
+            <div class="col-sm-8">
+                <c:if test="${course.coursetype==1}">
+                    <select class="form-control" name="coursetype">
+                        <option value="1" selected>公开课</option>
+                        <option value="2">必修课</option>
+                    </select>
+                </c:if>
+                <c:if test="${course.coursetype==2}">
+                    <select class="form-control" name="coursetype">
+                        <option value="1">公开课</option>
+                        <option value="2" selected>必修课</option>
+                    </select>
+                </c:if>
 
             </div>
-            <!--End-Action boxes-->
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">课程图标</label>
 
+            <div class="col-sm-8">
+                <input type="file" id="file" name="file"/>
+                <input type="text" id="courseIcon" name="icon" class="hidden"/>
+
+                <div id="wait_loading" style="padding: 50px 0 0 0;display:none;">
+                    <div style="width: 103px;margin: 0 auto;"><img id="iconImg"
+                                                                   src="<%=basePath%>/img/loading.gif"/>
+                    </div>
+                </div>
+                <input type="button" id="iconUp" class="btn btn-success" value="上传"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">课程名 :</label>
+
+            <div class="col-sm-8">
+                <input type="text" name="name" required class="form-control" placeholder="如何写一份漂亮的文案。。。"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">课程简介 :</label>
+
+            <div class="col-sm-8">
+                <textarea class="form-control" name="desc" required placeholder="这是干什么的，详细介绍下！"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">起止时间 :</label>
+
+            <div class="col-sm-8">
+                <input name="starttime" type="date" value="${course.starttime}"
+                       class="col-sm-5 form-control">到
+                <input name="endtime" type="date" value="${course.endtime}"
+                       class="col-sm-5 form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">主讲人 :</label>
+
+            <div class="col-sm-8">
+                <select class="form-control" multiple name="zhujiangren">
+                    <c:forEach items="${users}" var="user" varStatus="s">
+                        <option value="${user.userId}">${user.name}</option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">负责人 :</label>
+
+            <div class="col-sm-8">
+                <select class="form-control" multiple name="fuzeren">
+                    <c:forEach items="${users}" var="user" varStatus="s">
+                        <option value="${user.userId}">${user.name}</option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">参与人 :</label>
+
+            <div class="col-sm-8">
+
+                <select class="form-control" multiple name="canyuren">
+                    <c:forEach items="${users}" var="user" varStatus="s">
+                        <option value="${user.userId}">${user.name}</option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+        <c:if test="${type==1}">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">预计参与人数 :</label>
+
+                <div class="col-sm-8">
+                    <input type="number" name="expectperson" class="form-control" placeholder="有可能有多少人参与课程"/>
+                </div>
+            </div>
+        </c:if>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">上课地点 :</label>
+
+            <div class="col-sm-8">
+                <input type="text" name="place" class="form-control" placeholder="在哪上课"/>
+            </div>
         </div>
     </div>
-    <!--content-->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
 
-    <!--bottom-->
-    <jsp:include page="../bottom.jsp"></jsp:include>
-    <!--bottom-->
+<script src="<%=basePath%>/js/ajaxfileupload.js"></script>
+<script>
+    $(function () {
+        $("#iconUp").click(function () {
+            ajaxFileUpload();
+        });
+    });
+    function ajaxFileUpload() {
+        // 开始上传文件时显示一个图片
+        $("#wait_loading").ajaxStart(function () {
+            $(this).show();
+            // 文件上传完成将图片隐藏起来
+        }).ajaxComplete(function () {
+            //$(this).hide();
+        });
+        var elementIds = ["type"]; //flag为id、name属性名
+        $.ajaxFileUpload({
+            url: '<%=basePath%>/upLoadImage?type=course',
+            type: 'post',
+            secureuri: false, //一般设置为false
+            fileElementId: 'file', // 上传文件的id、name属性名
+            dataType: 'text', //返回值类型，一般设置为json、application/json
+            elementIds: elementIds, //传递参数到服务器
+            success: function (data, status) {
+                var reg = /<pre.+?>(.+)<\/pre>/g;
+                var result = data.match(reg);
+                datas = $.parseJSON(RegExp.$1);
+                $("#iconImg").attr("src", datas.obj.fileUrl);
+                $("#courseIcon").val(datas.obj.fileUrl);
+            },
+            error: function (data, status, e) {
+                console.log(data);
+            }
+        });
+        //return false;
+    }
+</script>

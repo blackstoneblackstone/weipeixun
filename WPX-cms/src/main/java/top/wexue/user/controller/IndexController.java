@@ -5,13 +5,12 @@ import top.wexue.common.service.WeixinAPI;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import top.wexue.dao.SchoolDao;
-import top.wexue.model.SessionInfo;
-import top.wexue.utils.Constants;
+import top.wexue.base.dao.SchoolDao;
+import top.wexue.common.model.SessionInfo;
+import top.wexue.base.utils.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -22,7 +21,6 @@ import java.util.Map;
 public class IndexController {
     @Autowired
     SchoolDao schoolDao;
-    @Autowired
     WeixinAPI weixinAPI;
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
@@ -31,8 +29,7 @@ public class IndexController {
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
-    public String home(HttpSession session, HttpServletRequest request) {
-        SessionInfo sessionInfo = (SessionInfo) session.getAttribute(Constants.Config.SESSION_USER_NAME);
+    public String home(SessionInfo sessionInfo, HttpServletRequest request) {
         Map<String, Object> school = schoolDao.getSchoolBycorpid(sessionInfo.getCorpid());
         String schooldesc = "";
         String schoolnotify = "";
