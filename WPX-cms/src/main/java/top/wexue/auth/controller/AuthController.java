@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.socket.TextMessage;
 import top.wexue.auth.model.LoginCodeCreator;
 import top.wexue.auth.model.LoginCodeManager;
 import top.wexue.base.utils.BaseMethod;
@@ -33,9 +34,9 @@ public class AuthController {
     @Autowired
     RedisCacheStorager redisCacheStorager;
 
-
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(String redirect_uri, HttpServletRequest request) {
+    public String login(String redirect_uri,String appId, HttpServletRequest request) {
+        //判断appId是否有,判断是否是信任地址
         String lc = BaseMethod.createUUID("LC");
         request.setAttribute("redirect_uri", redirect_uri);
         request.setAttribute("lc", lc);
@@ -49,7 +50,7 @@ public class AuthController {
         try {
             response.sendRedirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2f23249cbbc08dd1&redirect_uri=" + URLEncoder.encode(basePath + "/auth/login/mobile/code/" + lc, "UTF-8") + "&response_type=code&scope=snsapi_base&state=app1#wechat_redirect");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -62,8 +63,14 @@ public class AuthController {
             //添加user到redis
             try {
                 User user = userApi.getUserByCode(code);
+                LoginCodeCreator loginCodeCreator = new LoginCodeCreator("lc", user);
+                LoginCodeManager loginCodeManager = new LoginCodeManager(loginCodeCreator, redisCacheStorager);
+                try {
+                    loginCodeManager.refreshCache();
+                } catch (WeixinException e) {
+                    log.error(e.getMessage());
+                }
                 request.setAttribute("lc",lc);
-                request.setAttribute("user",JSONObject.toJSON(user));
             } catch (WeixinException e) {
                 log.error(e.getMessage());
             }
@@ -71,19 +78,11 @@ public class AuthController {
         return "auth/mobile-login";
     }
 
-    @RequestMapping(value = "/login/mobile/confirm", method = RequestMethod.POST)
+    @RequestMapping(value = "/login/mobile/confirm", method = RequestMethod.GET)
     @ResponseBody
-    public Result mobileConfirm(@RequestBody User user) {
-        LoginCodeCreator loginCodeCreator = new LoginCodeCreator("lc", user);
-        LoginCodeManager loginCodeManager = new LoginCodeManager(loginCodeCreator, redisCacheStorager);
-        User user1=null;
-        try {
-            loginCodeManager.refreshCache();
-            user1=loginCodeManager.getUser();
-        } catch (WeixinException e) {
-            log.error(e.getMessage());
-        }
-        return new Result(true, user1.toString());
+    public Result mobileConfirm(String lc) {
+        new LoginWebSocketHandler().sendMessageToUsers(new TextMessage(lc));
+        return new Result(true,lc);
     }
 
 //    @RequestMapping(value = "/login/code", method = RequestMethod.GET)

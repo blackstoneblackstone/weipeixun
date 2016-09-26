@@ -1,8 +1,9 @@
 package top.wexue.wpx.api;
 
+import com.foxinmy.weixin4j.cache.RedisCacheStorager;
 import com.foxinmy.weixin4j.exception.WeixinException;
-import com.foxinmy.weixin4j.http.weixin.JsonResult;
 import com.foxinmy.weixin4j.model.Button;
+import com.foxinmy.weixin4j.model.Token;
 import com.foxinmy.weixin4j.qy.api.MenuApi;
 import com.foxinmy.weixin4j.qy.api.OauthApi;
 import com.foxinmy.weixin4j.qy.api.SuiteApi;
@@ -10,10 +11,8 @@ import com.foxinmy.weixin4j.qy.api.UserApi;
 import com.foxinmy.weixin4j.qy.model.AgentSetter;
 import com.foxinmy.weixin4j.qy.model.OUserInfo;
 import com.foxinmy.weixin4j.qy.model.User;
-import com.foxinmy.weixin4j.qy.suite.SuitePerCodeHolder;
-import com.foxinmy.weixin4j.qy.suite.SuiteTicketHolder;
-import com.foxinmy.weixin4j.token.RedisTokenStorager;
-import com.foxinmy.weixin4j.token.TokenHolder;
+import com.foxinmy.weixin4j.token.PerTicketManager;
+import com.foxinmy.weixin4j.token.TicketManager;
 import com.foxinmy.weixin4j.type.ButtonType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,44 +27,43 @@ import java.util.List;
  */
 @Service
 public class WpxAPI {
-    private String suiteId = "tj3e700c876e37c5a5";
-    private String suiteSecret = "jNxEH7UABaHtrwOhGG2jBpUfU3x_EISNJTAGjjpYSGwFBmSSYZTb-Q9xsQgpyP4E";
-
-    private String serverId = "tjf5217ebac93f0b28";
-    private String serverSecret = "eaBQNTXz0HkFn21iTUhuI--fBwc9wRtDn5Z3vohzYehBvgKoOghhkEn_9Cih8C80";
-
-    public String getSuiteId() {
-        return suiteId;
-    }
-
-    @Value("#{configProperties['server.web.url']}")
+    @Value("#{suit.id}")
+    private String SUIT_ID;
+    @Value("#{suit.secret}")
+    private String SUIT_SECRET;
+    @Value("#{chat.id}")
+    private String CHAT_ID;
+    @Value("#{chat.secret}")
+    private String CHAT_SECRET;
+    @Autowired
+    private RedisCacheStorager<Token> redisCacheStorager;
+    @Value("#{server.web.url}")
     private String webUrl;
-
-
-    @Value("#{configProperties['qy_redirect_domain']}")
+    @Value("#{qy.redirect.domain}")
     private String redirectDomain;
 
     public SuiteApi suiteApi;
-    public SuiteApi serverApi;
+    public SuiteApi chatApi;
     public OauthApi oauthApi;
     @Autowired
     AuthCorpInfoDAO authCorpInfoDAO;
 
     public WpxAPI() {
-        RedisTokenStorager redisTokenStorager = new RedisTokenStorager("123.57.237.121",6379,"wexuetop");
-        suiteApi = new SuiteApi(new SuiteTicketHolder(suiteId, suiteSecret, redisTokenStorager));
-        serverApi = new SuiteApi(new SuiteTicketHolder(serverId, serverSecret, redisTokenStorager));
-        oauthApi = new OauthApi();
+        TicketManager suitTicketManager = new TicketManager(SUIT_ID, SUIT_SECRET, redisCacheStorager);
+        this.suiteApi = new SuiteApi(suitTicketManager);
+        TicketManager serverTicketManager = new TicketManager(CHAT_ID, CHAT_SECRET, redisCacheStorager);
+        this.chatApi = new SuiteApi(serverTicketManager);
+        this.oauthApi = new OauthApi();
     }
 
     public String getSuiteAuthorizeURL() throws WeixinException {
-        TokenHolder tokenHolder = suiteApi.getPreCodeHolder();
+        PerTicketManager perTicketManager = suiteApi.getPreCodeManager();
         String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(suiteId, tokenHolder.getAccessToken(), "http://www.wexue.top:8081/auth/getauthcode", "suite");
         return suiteAuthorizeURL;
     }
 
     public String getServerAuthorizeURL() throws WeixinException {
-        TokenHolder tokenHolder = serverApi.getPreCodeHolder();
+        TokenHolder tokenHolder = chatApi.getPreCodeHolder();
         String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(serverId, tokenHolder.getAccessToken(), "http://www.wexue.top:8081/auth/getauthcode", "server");
         return suiteAuthorizeURL;
     }
@@ -76,7 +74,7 @@ public class WpxAPI {
     }
 
     public OUserInfo exchangeServerPermanentCode(String authcode) throws WeixinException {
-        OUserInfo oUserInfo = serverApi.exchangePermanentCode(authcode);
+        OUserInfo oUserInfo = chatApi.exchangePermanentCode(authcode);
         return oUserInfo;
     }
 
@@ -95,8 +93,8 @@ public class WpxAPI {
                 //http://www.wexue.top/pxkc/authUser?corpId=wxf54e1b5e0b62fa96&state=wxf54e1b5e0b62fa96
                 //Button xueyuan = new Button("学院门户", "http://www.wexue.top/WPX-web/pxkc/portalWebJsp?corpId="+oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
                 //Button xueyuan = new Button("学院门户", "http://www.wexue.top/pxkc/portalWebJsp?corpId="+oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
-                Button gongkai = new Button("公开课", webUrl+"/auth/authUser?state=public&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
-                Button bixiu = new Button("必修课", webUrl+"/auth/authUser?state=require&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
+                Button gongkai = new Button("公开课", webUrl + "/auth/authUser?state=public&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
+                Button bixiu = new Button("必修课", webUrl + "/auth/authUser?state=require&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
                 //buttons.add(xueyuan);
                 buttons.add(gongkai);
                 buttons.add(bixiu);
@@ -112,7 +110,7 @@ public class WpxAPI {
             if (agentItem.getAppId() == 2) {
                 List<Button> buttons = new ArrayList<Button>();
                 Button xueyuan = new Button("课程签到", "scancode_push", ButtonType.scancode_push);
-                Button gongkai = new Button("我的课程", webUrl+"/auth/authUser?state=mycourse&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
+                Button gongkai = new Button("我的课程", webUrl + "/auth/authUser?state=mycourse&corpId=" + oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
 //               Button bixiu = new Button("我的必修课", "http://www.wexue.top/auth/authUser?state=myrequired&corpId="+oUserInfo.getCorpInfo().getCorpId(), ButtonType.view);
                 buttons.add(xueyuan);
                 buttons.add(gongkai);

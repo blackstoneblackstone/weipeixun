@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.wexue.base.dao.CourseDao;
 import top.wexue.base.model.Page;
-import top.wexue.base.model.SessionInfo;
 import top.wexue.wpx.api.WpxAPI;
+import top.wexue.wpx.model.SessionInfo;
 import top.wexue.wpx.utils.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;

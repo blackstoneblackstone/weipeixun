@@ -15,11 +15,12 @@
 %>
 <html>
 <head>
-    <title>Title</title>
+    <title>应用登陆</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
-    <link href="<%=basePath%>/css/weui.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="<%=basePath%>/lib/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #FFFFFF;
@@ -27,16 +28,19 @@
             text-align: center;
             margin: 0;
             padding: 0;
-            width: 640px;
+            width: 100%;
+            font-size: 20px;
         }
 
         .header {
+            width: 100%;
             height: 50px;
+            line-height: 50px;
             box-shadow: 2px 2px 2px #888888;
         }
 
         .login-div {
-            width: 400px;
+            width: 80%;
             height: 300px;
             background-color: #FFFFFF;
             box-shadow: 2px 2px 2px 2px #888888;
@@ -48,57 +52,42 @@
         .actor img {
             height: 100px;
             width: 100px;
+            border-radius: 50%;
+            margin-top: 50px;
         }
-
+        .login-btn{
+            margin-top:50px;
+        }
     </style>
     <script type='text/javascript' src='<%=basePath%>/js/jquery.min.js'></script>
+    <script type='text/javascript' src='<%=basePath%>/lib/bootstrap-3.3.5-dist/js/bootstrap.min.js'></script>
     <script>
-
-        if (/Android (\d+\.\d+)/.test(navigator.userAgent)) {
-            var version = parseFloat(RegExp.$1);
-            if (version > 2.3) {
-                var phoneScale = parseInt(window.screen.width) / 640;
-                document.write('<meta name="viewport" content="width=640, minimum-scale = ' + phoneScale + ', maximum-scale = ' + phoneScale + ', target-densitydpi=device-dpi">');
-            } else {
-                document.write('<meta name="viewport" content="width=640, target-densitydpi=device-dpi">');
-            }
-        } else {
-            document.write('<meta name="viewport" content="width=640, user-scalable=no, target-densitydpi=device-dpi">');
-        }
-
-
         function confirm() {
-
             $.ajax({
                 url: "<%=basePath%>/auth/login/mobile/confirm",
-                type: 'post',
+                type: 'get',
                 data: {
-                    lc:${lc},
-                    user:${user}
+                    lc:${lc}
                 },
-                dataType:"json",
                 success: function (data) {
                     console.log(data);
                     alert(data);
                 }
             });
         }
-
     </script>
 </head>
 <body>
 <div class="header">
-
+   应用登陆
 </div>
 <div class="login-div">
     <div class="actor">
         <img src="${user.avatar}">
     </div>
-    <button onclick="confirm()" class="weui_btn weui_btn_primary">
+    <button onclick="confirm()" class="login-btn btn btn-info">
         确认登陆
     </button>
-
-    ${user}
 </div>
 </body>
 </html>

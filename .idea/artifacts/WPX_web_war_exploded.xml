@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="WPX-web:war exploded">
-    <output-path>$PROJECT_DIR$/WPX-web/target/WPX-web</output-path>
+    <output-path>$PROJECT_DIR$/WPX-web/src/main/webapp</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
