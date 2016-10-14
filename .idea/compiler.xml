@@ -32,6 +32,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="UnifiedLogin" target="1.6" />
       <module name="weixin4j" target="1.6" />
       <module name="weixin4j-base" target="1.6" />
       <module name="weixin4j-mp" target="1.6" />

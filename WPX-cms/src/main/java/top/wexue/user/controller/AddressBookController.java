@@ -70,7 +70,7 @@ public class AddressBookController {
     private UserRepository userRepository;
 
 
-    @Value("#{weixinConfig.suite_id}")
+    @Value("${suite_id}")
     private String SUIT_ID;
 
     @RequestMapping(value = "/tree", method = RequestMethod.GET)

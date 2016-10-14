@@ -43,17 +43,17 @@ public class LoginController {
     /**
      * 微信配置
      */
-    @Value("${weixinConfig.suit_id}")
+    @Value("${suite_id}")
     private String SUIT_ID;
-    @Value("${weixinConfig.suit_secret}")
+    @Value("${suite_secret}")
     private String SUIT_SECRET;
-    @Value("${weixinConfig.chat_id}")
+    @Value("${chat_id}")
     private String CHAT_ID;
-    @Value("${weixinConfig.chat_secret}")
+    @Value("${chat_secret}")
     private String CHAT_SECRET;
-    @Value("${weixinConfig.corp_id}")
+    @Value("${corp_id}")
     private String CORP_ID;
-    @Value("${weixinConfig.provider_secret}")
+    @Value("${provider_secret}")
     private String PROVIDER_SECRET;
 
     @Autowired

@@ -47,7 +47,8 @@
 		<module>WPX-base</module>
 		<module>WPX-cms</module>
 		<module>WPX-web</module>
-	</modules>
+        <module>UnifiedLogin</module>
+    </modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.6</maven.compiler.source>

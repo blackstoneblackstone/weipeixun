@@ -7,9 +7,9 @@
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context-4.0.xsd
        http://www.springframework.org/schema/mvc
-       http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
-       ">
+       http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
 
+    <context:property-placeholder location="classpath:weixin.properties"/>
     <!-- 对包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 需要更改 -->
     <context:component-scan base-package="top.wexue"/>
     <!-- 激活@Controller模式 注入sessionInfo参数 -->
@@ -51,18 +51,13 @@
             <mvc:exclude-mapping path="/auth/login"/>
             <mvc:exclude-mapping path="/webSocketServer/**"/>
             <mvc:exclude-mapping path="/auth/login/**"/>
+            <mvc:exclude-mapping path="/user/login"/>
+            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/loginBak"/>
+            <mvc:exclude-mapping path="/user/reg"/>
+            <mvc:exclude-mapping path="/registJsp"/>
+            <mvc:exclude-mapping path="/qyauth"/>
             <bean class="top.wexue.common.controller.SecurityInterceptor">
-                <!-- 不需要权限验证的地址 -->
-                <property name="excludeUrls">
-                    <list>
-                        <value>/user/login</value>
-                        <value>/login</value>
-                        <value>/loginBak</value>
-                        <value>/user/reg</value>
-                        <value>/registJsp</value>
-                        <value>/qyauth</value>
-                    </list>
-                </property>
             </bean>
         </mvc:interceptor>
     </mvc:interceptors>
