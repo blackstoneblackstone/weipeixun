@@ -27,20 +27,22 @@ import java.util.List;
  */
 @Service
 public class WpxAPI {
-    @Value("#{suit.id}")
+    @Value("${suit_id}")
     private String SUIT_ID;
-    @Value("#{suit.secret}")
+    @Value("${suit_secret}")
     private String SUIT_SECRET;
-    @Value("#{chat.id}")
+    @Value("${chat_id}")
     private String CHAT_ID;
-    @Value("#{chat.secret}")
+    @Value("${chat_secret}")
     private String CHAT_SECRET;
     @Autowired
     private RedisCacheStorager<Token> redisCacheStorager;
-    @Value("#{server.web.url}")
+    @Value("${server_web_url}")
     private String webUrl;
-    @Value("#{qy.redirect.domain}")
+    @Value("${qy_redirect_domain}")
     private String redirectDomain;
+    @Value("${auth_redirect_url}")
+    private String authedirectUrl;
 
     public SuiteApi suiteApi;
     public SuiteApi chatApi;
@@ -56,31 +58,35 @@ public class WpxAPI {
         this.oauthApi = new OauthApi();
     }
 
+    /**
+     * 获取授权路径，用于获取当前用户信息
+     * @return
+     * @throws WeixinException
+     */
     public String getSuiteAuthorizeURL() throws WeixinException {
-        PerTicketManager perTicketManager = suiteApi.getPreCodeManager();
-        String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(suiteId, tokenHolder.getAccessToken(), "http://www.wexue.top:8081/auth/getauthcode", "suite");
+        String suiteAuthorizeURL = oauthApi.getThirdAuthorizationURL(authedirectUrl,"");
         return suiteAuthorizeURL;
     }
 
-    public String getServerAuthorizeURL() throws WeixinException {
-        TokenHolder tokenHolder = chatApi.getPreCodeHolder();
-        String suiteAuthorizeURL = oauthApi.getSuiteAuthorizeURL(serverId, tokenHolder.getAccessToken(), "http://www.wexue.top:8081/auth/getauthcode", "server");
-        return suiteAuthorizeURL;
+    /**
+     * 获取会话授权的地址 用于获取用户信息
+     * @return
+     * @throws WeixinException
+     */
+    public String getChateAuthorizeURL() throws WeixinException {
+        return "";
     }
 
     public OUserInfo exchangeSuitePermanentCode(String authcode) throws WeixinException {
-        OUserInfo oUserInfo = suiteApi.exchangePermanentCode(authcode);
-        return oUserInfo;
+        return null;
     }
 
     public OUserInfo exchangeServerPermanentCode(String authcode) throws WeixinException {
-        OUserInfo oUserInfo = chatApi.exchangePermanentCode(authcode);
-        return oUserInfo;
+        return null;
     }
 
     public String getPerCode(String authCorpId) throws WeixinException {
-        SuitePerCodeHolder suitePerCodeHolder = suiteApi.getPerCodeHolder(authCorpId);
-        return suitePerCodeHolder.getPermanentCode();
+        return null;
     }
 
     public String createMenu(String authCorid, OUserInfo oUserInfo) throws WeixinException {
