@@ -67,26 +67,36 @@
                             <span>调研测试</span></a>
                     </li>
                     <li role="presentation">
-                        <a href="<%=basePath%>/platform/speaker"><i class="glyphicon glyphicon-book"></i>
+                        <a href="<%=basePath%>/platform/speaker"><i class="glyphicon glyphicon-share"></i>
                             <span>资源管理</span></a>
                     </li>
                     <li role="presentation"><a href="<%=basePath%>/platform/material">
                         <i class="glyphicon glyphicon-folder-close"></i>
                         <span>培训资料</span></a></li>
                     <li role="presentation">
-                        <a href="<%=basePath%>/platform/notify"><i class="icon icon-pencil"></i>
+                        <a href="<%=basePath%>/platform/notify"><i class="glyphicon glyphicon-envelope"></i>
                             <span>发消息</span></a>
                     </li>
                     <li role="presentation">
                         <a href="<%=basePath%>/platform/message">
-                            <i class="icon icon-file"></i> <span>通知中心</span>
+                            <i class="glyphicon glyphicon glyphicon-bell"></i> <span>通知中心</span>
                         </a>
 
                     </li>
                     <li role="presentation">
                         <a href="<%=basePath%>/platform">
-                            <i class="glyphicon glyphicon-user div-user"></i> <span
-                                class="div-user">${userinfo.username}</span>
+                            <c:if test="${!empty userinfo.useravator}">
+                                <img src="${userinfo.useravator}" style="height: 30px">
+                            </c:if>
+                            <c:if test="${empty userinfo.useravator}">
+                                <img src="<%=basePath%>/img/dep_icon.jpg" style="height: 30px;margin-top: -10px">
+                            </c:if>
+                            <c:if test="${!empty userinfo.useravator}">
+                                <span class="div-user">${userinfo.username}</span>
+                            </c:if>
+                            <c:if test="${empty userinfo.useravator}">
+                                <span class="div-user">匿名</span>
+                            </c:if>
                         </a>
                     </li>
                     <li role="presentation">

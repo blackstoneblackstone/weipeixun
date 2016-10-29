@@ -34,18 +34,18 @@ public class AuthController {
     @Autowired
     private AuthDepartmentDao authDepartmentDao;
 
-    @Value("#{configProperties['server.cms.url']}")
+    @Value("${server.cms.url}")
     private String cmsUrl;
 
-
-    @Value("#{configProperties['server.web.url']}")
+    @Value("${server.web.url}")
     private String webUrl;
+
+    private String authCodeUrl = "/auth/getauthcode";
 
     @RequestMapping(value = "/suite", method = RequestMethod.GET)
     public String Auth(HttpServletRequest request) {
         try {
-            String suiteAuthorizeURL = wpxAPI.getSuiteAuthorizeURL();
-            System.out.println("suiteAuthorizeURL:" + suiteAuthorizeURL);
+            String suiteAuthorizeURL = wpxAPI.getSuiteAuthorizationURL(authCodeUrl, "web");
             request.setAttribute("authurl", suiteAuthorizeURL);
         } catch (WeixinException e) {
             e.printStackTrace();
@@ -56,7 +56,7 @@ public class AuthController {
     @RequestMapping(value = "/server", method = RequestMethod.GET)
     public String pxkcAuth(HttpServletRequest request) {
         try {
-            String suiteAuthorizeURL = wpxAPI.getServerAuthorizeURL();
+            String suiteAuthorizeURL = wpxAPI.getChatAuthorizationURL(authCodeUrl, "web");
             request.setAttribute("authurl", suiteAuthorizeURL);
         } catch (WeixinException e) {
             e.printStackTrace();
@@ -65,8 +65,8 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public void login(String auth_code,HttpServletResponse response,String state, String expires_in) {
-        String loginAuthURL = cmsUrl+"/qyauth?auth_code="+auth_code+"&state="+state+"&expires_in="+expires_in;
+    public void login(String auth_code, HttpServletResponse response, String state, String expires_in) {
+        String loginAuthURL = cmsUrl + "/qyauth?auth_code=" + auth_code + "&state=" + state + "&expires_in=" + expires_in;
         try {
             response.sendRedirect(loginAuthURL);
         } catch (IOException e) {
@@ -88,16 +88,15 @@ public class AuthController {
                 oUserInfo = wpxAPI.exchangeServerPermanentCode(auth_code);
             }
 //            Map<String, Object> map = authCorpInfoDAO.getCorpById(oUserInfo.getCorpInfo().getCorpId());
-            authCorpInfoDAO.delete(wpxAPI.getSuiteId(), oUserInfo.getCorpInfo().getCorpId());
+            authCorpInfoDAO.delete(wpxAPI.getSUIT_ID(), oUserInfo.getCorpInfo().getCorpId());
 
-            re = re + authCorpInfoDAO.insert(oUserInfo, wpxAPI.getPerCode(oUserInfo.getCorpInfo().getCorpId()), wpxAPI.getSuiteId());
-            authInfoDAO.delete(oUserInfo, wpxAPI.getSuiteId());
-            re = re + authInfoDAO.insert(oUserInfo, wpxAPI.getSuiteId());
+            re = re + authCorpInfoDAO.insert(oUserInfo, wpxAPI.getPerCode(oUserInfo.getCorpInfo().getCorpId()), wpxAPI.getSUIT_ID());
+            authInfoDAO.delete(oUserInfo, wpxAPI.getSUIT_ID());
+            re = re + authInfoDAO.insert(oUserInfo, wpxAPI.getSUIT_ID());
             List<Map<String, Object>> des = authDepartmentDao.getDepartments(oUserInfo.getCorpInfo().getCorpId());
             if (des == null || des.size() == 0) {
-                re = re + authDepartmentDao.insert(oUserInfo, wpxAPI.getSuiteId());
+                re = re + authDepartmentDao.insert(oUserInfo, wpxAPI.getSUIT_ID());
             }
-            msg = wpxAPI.createMenu(oUserInfo.getCorpInfo().getCorpId(), oUserInfo);
             response.sendRedirect(cmsUrl);
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,19 +107,19 @@ public class AuthController {
     public void authUser(String corpId, String state, HttpServletResponse response, HttpServletRequest request) {
         String redirectUri = "";
         if ("webportal".equals(state)) {
-            redirectUri = webUrl+"/pxkc/portalWebJsp";
+            redirectUri = webUrl + "/pxkc/portalWebJsp";
         }
         if ("public".equals(state)) {
-            redirectUri = webUrl+"/pxkc/publicCourseJsp";
+            redirectUri = webUrl + "/pxkc/publicCourseJsp";
         }
         if ("require".equals(state)) {
-            redirectUri = webUrl+"/pxkc/requiredCourseJsp";
+            redirectUri = webUrl + "/pxkc/requiredCourseJsp";
         }
         if ("mycourse".equals(state)) {
-            redirectUri = webUrl+"/wdkc/myCourseJsp";
+            redirectUri = webUrl + "/wdkc/myCourseJsp";
         }
         if ("ordercourse".equals(state)) {
-            redirectUri = webUrl+"/wdkc/orderCourseJsp";
+            redirectUri = webUrl + "/wdkc/orderCourseJsp";
         }
         String Url = wpxAPI.getAuthUserInfoUrl(redirectUri, corpId, corpId);
         try {

@@ -14,7 +14,7 @@
     <!-- 激活@Controller模式 -->
     <mvc:annotation-driven/>
     <!-- 对包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 需要更改 -->
-    <context:component-scan base-package="top.wexue"/>
+    <context:component-scan base-package="top.wexue.wpx"/>
     <!-- Spring MVC JSON配置 -->
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
@@ -34,7 +34,7 @@
     </bean>
 
     <!-- 对模型视图名称的解析，即在模型视图名称添加前后缀 -->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/WEB-INF/view/"
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/WEB-INF/view"
           p:suffix=".jsp"/>
     <!-- 拦截器 -->
 
