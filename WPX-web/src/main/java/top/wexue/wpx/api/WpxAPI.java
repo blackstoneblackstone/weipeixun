@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import top.wexue.base.dao.AuthCorpInfoDAO;
+import top.wexue.base.repository.CorpInfoRepository;
 
 import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
@@ -35,10 +36,10 @@ import java.util.List;
 @Service
 public class WpxAPI {
 
-    @Value("${suit_id}")
+    @Value("${suite_id}")
     private String SUIT_ID;
 
-    @Value("${suit_secret}")
+    @Value("${suite_secret}")
     private String SUIT_SECRET;
 
     @Value("${chat_id}")
@@ -51,14 +52,14 @@ public class WpxAPI {
     private String webUrl;
     @Value("${qy_redirect_domain}")
     private String redirectDomain;
-    @Value("${auth_redirect_url}")
+    @Value("${suite_oauth_redirect_uri}")
     private String authedirectUrl;
 
     public SuiteApi suiteApi;
     public SuiteApi chatApi;
     public OauthApi oauthApi;
     @Autowired
-    AuthCorpInfoDAO authCorpInfoDAO;
+    CorpInfoRepository corpInfoRepository;
 
     public WpxAPI() {
 
@@ -70,7 +71,6 @@ public class WpxAPI {
         this.suiteApi = new SuiteApi(suitTicketManager);
         TicketManager serverTicketManager = new TicketManager(CHAT_ID, CHAT_SECRET, redisCacheStorager);
         this.chatApi = new SuiteApi(serverTicketManager);
-        this.oauthApi = new OauthApi();
     }
 
     public String getSUIT_ID() {
@@ -126,20 +126,13 @@ public class WpxAPI {
         return null;
     }
 
-    public String getAuthUserInfoUrl(String redirectUri, String state, String corpId) {
-        return "";
+    public String getAuthUserInfoUrl(String redirectUri, String state,String corpId) {
+        this.oauthApi = new OauthApi();
+        String authUrl=oauthApi.getUserAuthorizationURL(redirectUri,state,corpId);
+        return authUrl;
     }
 
-    public User getCurrentUser(String code, String corpid) {
-//        TokenHolder tokenHolder = suiteApi.getTokenSuiteHolder(corpid);
-//        UserApi userApi = new UserApi(tokenHolder);
-//        try {
-//            return userApi.getUserByCode(code);
-//        } catch (WeixinException e) {
-//            e.printStackTrace();
-//        }
-        return null;
-    }
+
 
     public User getUserById(String userId, String corpid) throws WeixinException {
 //        TokenHolder tokenHolder = suiteApi.getTokenSuiteHolder(corpid);

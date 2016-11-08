@@ -1,6 +1,8 @@
 package top.wexue.wpx.controller;
 
+import com.foxinmy.weixin4j.cache.RedisCacheStorager;
 import com.foxinmy.weixin4j.exception.WeixinException;
+import com.foxinmy.weixin4j.model.Token;
 import com.foxinmy.weixin4j.qy.model.OUserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +13,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import top.wexue.base.dao.AuthCorpInfoDAO;
 import top.wexue.base.dao.AuthDepartmentDao;
 import top.wexue.base.dao.AuthInfoDAO;
+import top.wexue.base.utils.MD5Util;
+import top.wexue.wpx.api.QyAPI;
 import top.wexue.wpx.api.WpxAPI;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +41,19 @@ public class AuthController {
     @Autowired
     private AuthDepartmentDao authDepartmentDao;
 
-    @Value("${server.cms.url}")
+    @Value("${server_cms_url}")
     private String cmsUrl;
 
-    @Value("${server.web.url}")
+    @Value("${server_web_url}")
     private String webUrl;
+
+    @Value("${suite_id}")
+    private String SUIT_ID;
+    @Value("${suite_secret}")
+    private String SUIT_SECRET;
+    @Autowired
+    RedisCacheStorager<Token> redisCacheStorager;
+
 
     private String authCodeUrl = "/auth/getauthcode";
 
@@ -127,5 +142,28 @@ public class AuthController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Auth2.0获取用户信息
+     *
+     * @param code
+     * @param response
+     * @param state
+     */
+    @RequestMapping(value = "/userCookie", method = RequestMethod.GET)
+    public String userCookie(String code, HttpServletResponse response, String state) throws UnsupportedEncodingException, WeixinException {
+        String corpId = state.split("@")[0];
+        String sourceUrl = state.split("@")[1];
+        String cookieKey = MD5Util.md5(corpId + "userId");
+//        QyAPI qyAPI = new QyAPI(corpId, redisCacheStorager, SUIT_ID, SUIT_SECRET);
+//        String userId = qyAPI.getCurrentUserId(code);
+        String userId="muzijun";
+        Cookie cookie = new Cookie(cookieKey, userId);
+        cookie.setMaxAge(3600*24);
+        //设置路径，这个路径即该工程下都可以访问该cookie 如果不设置路径，那么只有设置该cookie路径及其子路径可以访问
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        return String.format("%s:%s", "redirect", URLDecoder.decode(sourceUrl, "utf-8"));
     }
 }

@@ -30,19 +30,19 @@ public class WdkcController {
 
     @RequestMapping(value = "/myCourseJsp", method = RequestMethod.GET)
     public String orderCourse(String code, String state, HttpServletRequest request) {
-        User user = wpxAPI.getCurrentUser(code, state);
+//        User user = wpxAPI.getCurrentUser(code, state);
        // System.out.println(user.toString());
 //        User user = new User("lihb", "木子君");
 //        user.setAvatar("http://img5.imgtn.bdimg.com/it/u=2709469067,3830556490&fm=21&gp=0.jpg");
-        WebUtils.setSessionInfo(request, user, state);
+//        WebUtils.setSessionInfo(request, user, state);
 
         return "wx/wdkc/myCourse";
     }
 
     @RequestMapping(value = "/myRequiredCourseJsp", method = RequestMethod.GET)
     public String myRequiredCourse(String code, String state, HttpServletRequest request) {
-        User user = wpxAPI.getCurrentUser(code, state);
-        WebUtils.setSessionInfo(request, user, state);
+//        User user = wpxAPI.getCurrentUser(code, state);
+//        WebUtils.setSessionInfo(request, user, state);
         return "wx/wdkc/myRequiredCourse";
     }
 

@@ -20,6 +20,7 @@ public class Constants {
     //Config
     public static class Config {
         public static String SESSION_USER_NAME = "userinfo";
+        public static String QY_API_NAME = "qyapi";
     }
 
     //EntityType

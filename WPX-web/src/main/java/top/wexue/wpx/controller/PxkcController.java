@@ -1,8 +1,10 @@
 package top.wexue.wpx.controller;
 
 import com.foxinmy.weixin4j.qy.model.User;
+import com.foxinmy.weixin4j.util.URLEncodingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -10,12 +12,20 @@ import top.wexue.base.dao.AuthUserDao;
 import top.wexue.base.dao.CourseDao;
 import top.wexue.base.dao.PortalDao;
 import top.wexue.base.dao.ProjectDao;
+import top.wexue.base.entity.TUser;
 import top.wexue.base.model.Page;
+import top.wexue.base.repository.UserRepository;
+import top.wexue.base.utils.MD5Util;
+import top.wexue.wpx.api.CommonAPI;
+import top.wexue.wpx.api.QyAPI;
 import top.wexue.wpx.api.WpxAPI;
 import top.wexue.wpx.model.SessionInfo;
 import top.wexue.wpx.utils.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,29 +46,37 @@ public class PxkcController {
     @Autowired
     private AuthUserDao authUserDao;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private PortalDao webTemplateDao;
+    @Autowired
+    private CommonAPI commonAPI;
 
-    @RequestMapping(value = "/publicCourseJsp", method = RequestMethod.GET)
-    public String publicCourseJsp(String code, String state, HttpServletRequest request) {
-        User user = wpxAPI.getCurrentUser(code, state);
-//        User user = new User("lihb", "木子君");
-//        user.setAvatar("http://img5.imgtn.bdimg.com/it/u=2709469067,3830556490&fm=21&gp=0.jpg");
-        WebUtils.setSessionInfo(request, user, state);
-        return "wx/pxkc/publicCourse";
+
+    @RequestMapping(value = "/publicCourse/{corpId}", method = RequestMethod.GET)
+    public String publicCourseJsp(HttpServletRequest request, @PathVariable String corpId) throws UnsupportedEncodingException {
+        String currentUrl = request.getRequestURL().toString();
+        String result = commonAPI.userCreator(request, corpId, currentUrl);
+        if (result.contains("redirect")) {
+            return result;
+        } else {
+            TUser user = userRepository.getOne(result);
+            request.setAttribute("user", user);
+            return "wx/pxkc/publicCourse";
+        }
     }
 
     @RequestMapping(value = "/requiredCourseJsp", method = RequestMethod.GET)
     public String requiredCourseJsp(String code, String state, HttpServletRequest request) {
-        User user = wpxAPI.getCurrentUser(code, state);
-        WebUtils.setSessionInfo(request, user, state);
+
         return "wx/pxkc/requiredCourse";
     }
 
     @RequestMapping(value = "/requiredCourseDetailJsp", method = RequestMethod.GET)
     public String requiredCourseDetailJsp(String courseid, String userid, HttpServletRequest request) {
-        SessionInfo sessionInfo=WebUtils.getSessionInfo(request);
+        SessionInfo sessionInfo = WebUtils.getSessionInfo(request);
         Map<String, Object> course = courseDao.getCourseById(courseid);
-        Map<String, Object> user = authUserDao.getUserById(userid,sessionInfo.getCorpid());
+        Map<String, Object> user = authUserDao.getUserById(userid, sessionInfo.getCorpid());
         request.setAttribute("course", course);
         request.setAttribute("user", user);
         return "wx/pxkc/requiredCourseDetail";

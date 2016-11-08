@@ -65,22 +65,22 @@
         <servlet-name>default</servlet-name>
         <url-pattern>*.jpg</url-pattern>
     </servlet-mapping>
-    <error-page>
-        <error-code>500</error-code>
-        <location>/error.html?type=500</location>
-    </error-page>
-    <error-page>
-        <error-code>403</error-code>
-        <location>/error.html?type=403</location>
-    </error-page>
-    <error-page>
-        <error-code>404</error-code>
-        <location>/error.html?type=404</location>
-    </error-page>
-    <error-page>
-        <error-code>405</error-code>
-        <location>/error.html?type=405</location>
-    </error-page>
+    <!--<error-page>-->
+        <!--<error-code>500</error-code>-->
+        <!--<location>/error.html?type=500</location>-->
+    <!--</error-page>-->
+    <!--<error-page>-->
+        <!--<error-code>403</error-code>-->
+        <!--<location>/error.html?type=403</location>-->
+    <!--</error-page>-->
+    <!--<error-page>-->
+        <!--<error-code>404</error-code>-->
+        <!--<location>/error.html?type=404</location>-->
+    <!--</error-page>-->
+    <!--<error-page>-->
+        <!--<error-code>405</error-code>-->
+        <!--<location>/error.html?type=405</location>-->
+    <!--</error-page>-->
     <session-config>
         <session-timeout>-1</session-timeout>
     </session-config>
